@@ -2,6 +2,23 @@
 
 This project is a Shiny application developed in **R**, running in **WSL Ubuntu** with **VS Code** integration, and version-controlled via **GitHub**.
 
+RUN THIS IN UBUNTU TERMINAL:
+sudo apt update && sudo apt install -y \
+  build-essential \
+  libssl-dev \
+  libpq-dev \
+  libsqlite3-dev \
+  libxml2-dev \
+  libcurl4-openssl-dev
+
+
+THEN RUN THIS IN YOUR R TERMINAL:
+install.packages(c(
+  "shiny","bslib","shinyWidgets","shinyjs","shinyvalidate","DT",
+  "shinymanager","DBI","RSQLite","RPostgres","pool","dplyr","dbplyr",
+  "tidyr","readr","jsonlite","ggplot2","plotly"
+))
+
 ---
 
 ## 🚀 Setup Guide
