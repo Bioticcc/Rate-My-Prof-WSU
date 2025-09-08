@@ -27,7 +27,7 @@ ui <- tagList(
     selected = "home",
     theme    = theme, 
 
-    # Home tab
+    #Home tab
     tabPanel(
       title = "Home",
       value = "home",
@@ -41,7 +41,7 @@ ui <- tagList(
       )
     ),
 
-    # Authentication tab
+    #Authentication tab
     tabPanel(
       title = "Authentication",
       value = "auth",
@@ -53,6 +53,31 @@ ui <- tagList(
           tags$h1("Submit WSU ID in order to publish reviews")
         )
       )
+    ),
+
+    # List Professors tab
+    tabPanel(
+      title = "Professors",
+      value = "prof",
+      tags$div(
+        class = "header-box",
+        style = "display: flex; align-items: center; gap: 20px; margin-bottom: 20px;",
+        tags$div(
+          style = "display: flex; flex-direction: column; gap: 6px;",
+          tags$h1("List of WSU Professors")
+        )
+      )
     )
   )
+
+
+
+
+
+
+
+
+
+
+  
 )

@@ -16,14 +16,14 @@
 # Core
 library(shiny)
 
-# UI polish / widgets
+# UI
 library(bslib)
 library(shinyWidgets)
 library(shinyjs)
 library(shinyvalidate)
 library(DT)
 
-# Authentication
+# Authentication (logging in)
 library(shinymanager)  
        
 # Data / persistence
