@@ -1,0 +1,40 @@
+/*THE FOLLOWING SECTIONS WERE MADE BY CHAT GPT: .overlay-root and .overlay-card
+    -Used gpt to generate a default template for the css styles to act as an overlay.
+    -Manually edited colors and size.
+    What the AI is doing here is making those classes I mentioned in ui.R earlier. When we set those tags$div containers to certain
+    classes, this is where we actually make those classes exist. By setting the overlays design to overlay-root and overlay-card,
+    we allow ourselves to simply make any changes we like in style.css without touching the core code in UI. We could also just be doing this
+    by slotting in tags$head scripts, but that gets very messy very quickly, and this is very much so preferable. 
+*/
+/* Blue-tinted full-screen backdrop */
+.overlay-root {
+  position: fixed;
+  inset: 0;
+  background: rgba(163, 169, 175, 0.65); 
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* Larger centered lightbox */
+.overlay-card {
+  background: #9b9b9b;
+  color: #111;
+  width: 60%;              
+  max-width: 1200px;       /* cap it so it doesn’t stretch on huge screens */
+  min-height: 70vh;        /* make it tall like a real page */
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers text/buttons inside */
+  text-align: center;      /* center headings & text */
+}
+
+/* Disable background scrolling when overlay is open */
+body:has(.overlay-root) {
+  overflow: hidden;
+}
