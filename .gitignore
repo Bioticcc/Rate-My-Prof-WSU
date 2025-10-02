@@ -1,0 +1,11 @@
+# R/Shiny project ignores
+.Rhistory
+.RData
+.Rproj.user/
+
+# Local credentials DB should not be versioned
+credentials.sqlite
+
+# OS / editor noise
+*.DS_Store
+Thumbs.db

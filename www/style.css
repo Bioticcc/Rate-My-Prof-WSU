@@ -1,0 +1,108 @@
+/* Base */
+:root{
+  --wsu-crimson:#981E32;
+  --wsu-crimson-dark:#7a1828;
+  --text:#1f2937;
+  --muted:#5e6a71;
+  --bg:#f7f7f9;
+  --surface:#ffffff;
+  --ring:rgba(152,30,50,0.35);
+}
+
+html,body{
+  height:100%;
+}
+
+body{
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Navbar (Bootstrap 3) */
+.navbar-inverse{
+  background-color:var(--wsu-crimson);
+  border-color:var(--wsu-crimson);
+}
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-nav>li>a{
+  color:#fff;
+}
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-nav>li>a:hover,
+.navbar-inverse .navbar-nav>li>a:focus{
+  color:#fff;
+  background:rgba(255,255,255,0.12);
+}
+.navbar-inverse .navbar-toggle{
+  border-color:rgba(255,255,255,0.4);
+}
+.navbar-inverse .navbar-toggle .icon-bar{
+  background-color:#fff;
+}
+
+/* Hero */
+.hero{
+  background:linear-gradient(135deg, #fff 0%, #fff 65%, rgba(152,30,50,0.08) 100%);
+  border:1px solid #ececec;
+  border-radius:14px;
+  padding:32px 28px;
+  margin:18px 0 24px;
+}
+.hero .hero-content h1{
+  margin:0 0 6px;
+  font-weight:700;
+  line-height:1.25;
+}
+.hero .subtext{
+  color:var(--muted);
+  margin:0 0 18px;
+}
+.greet-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.greet-row .form-group{ /* textInput wrapper */
+  margin:0;
+  flex:1 1 auto;
+}
+.greet-row input.form-control{
+  height:40px;
+  border-radius:10px;
+  border:1px solid #e1e1e1;
+  box-shadow:none;
+}
+.greet-row input.form-control:focus{
+  border-color:var(--wsu-crimson);
+  box-shadow:0 0 0 3px var(--ring);
+  outline:0;
+}
+.btn-primary{
+  background:var(--wsu-crimson);
+  border-color:var(--wsu-crimson);
+  border-radius:10px;
+  padding:8px 14px;
+  font-weight:600;
+}
+.btn-primary:hover,
+.btn-primary:focus{
+  background:var(--wsu-crimson-dark);
+  border-color:var(--wsu-crimson-dark);
+}
+.greet-msg{
+  margin-top:12px;
+  font-weight:600;
+}
+
+/* Cards */
+.card{
+  background:var(--surface);
+  border:1px solid #ececec;
+  border-radius:12px;
+  padding:18px 16px;
+  margin:10px 0 16px;
+}
+.card h3{margin-top:0}
