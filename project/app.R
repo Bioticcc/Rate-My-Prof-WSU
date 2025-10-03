@@ -4,6 +4,11 @@
 #git commit -m "your message here" #commit plus message
 #git push #pushes changes to repo!
 
+#FOR PULLING FROM THE MAIN REPO, FOLLOW THESE STEPS:
+#git status
+#git pull origin main
+
+
 #When running from VScode, this is how you do it:
 #(Ctrl + ~) to open terminal for project.
 #cd project (unless you are already in that folder)

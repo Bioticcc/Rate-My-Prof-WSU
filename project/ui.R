@@ -35,22 +35,39 @@ ui <- tagList(
     # Home tab
     tabPanel(
       title = "Home",
-      value = "home", #this is how we connect to  buttons later on
-      # Hero section with modern look
+      value = "home",
+
+      # Hero section
       div(class = "hero",
           div(class = "hero-content",
               h1("Find and share insights on WSU professors"),
               p(class = "subtext",
                 "Search, rate, and review to help Cougs pick the right courses."),
-              div(class = "greet-row",
-                  textInput("name", NULL, placeholder = "Your name"),
-                  actionButton("go", "Greet", class = "btn btn-primary"),
-                  actionButton("loginB", "Register / Login", class = "btn btn-outline-light")
-              ),
-              uiOutput("greet")
+              div(
+                actionButton("loginB", "Register / Login", class = "btn btn-primary btn-lg")
+              )
           )
+      ),
+
+      # Two cards below the hero
+      fluidRow(
+        column(
+          width = 6,
+          div(class = "card",
+              h3("Top Professors"),
+              p("Browse the highest-rated professors across departments.")
+          )
+        ),
+        column(
+          width = 6,
+          div(class = "card",
+              h3("Trending Courses"),
+              p("See courses with the most recent ratings and reviews.")
+          )
+        )
       )
     ),
+
 
     tabPanel(
       title = "Reviews of the Day!",

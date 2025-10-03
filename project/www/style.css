@@ -99,3 +99,242 @@ body{
 /* Card blocks */
 .card{background:var(--surface);border:1px solid #ececec;border-radius:12px;padding:18px 16px;margin:10px 0 16px}
 .card h2,.card h3{margin-top:0}
+
+/* =========================
+   Dark Mode — WSU Accents
+   ========================= */
+:root{
+  --wsu-crimson:#981E32;
+  --wsu-crimson-dark:#7a1828;
+  --text:#e5e7eb;         /* gray-200 */
+  --muted:#9ca3af;        /* gray-400 */
+  --bg:#0b0f14;           /* near-black */
+  --surface:#121826;      /* panel/card bg */
+  --surface-2:#0f1522;    /* slightly darker for contrast blocks */
+  --ring:rgba(152,30,50,.45);
+  --border:rgba(255,255,255,.08);
+}
+
+html,body{height:100%}
+body{
+  font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Navbar */
+.navbar{
+  background-color:#0e1421 !important;
+  border-bottom:1px solid var(--border);
+}
+.navbar .navbar-brand,
+.navbar .nav-link{ color:#e5e7eb !important }
+.navbar .nav-link:hover,
+.navbar .nav-link:focus{ color:#ffffff !important; opacity:.95 }
+
+/* Hero */
+.hero{
+  background:linear-gradient(135deg, var(--surface) 0%, var(--surface) 65%, rgba(152,30,50,0.10) 100%);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:32px 28px;
+  margin:18px 0 24px;
+}
+.hero .hero-content h1{margin:0 0 6px;font-weight:700;line-height:1.25;color:#f3f4f6}
+.hero .subtext{color:var(--muted);margin:0 0 18px}
+
+/* Inputs */
+.greet-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.greet-row .form-group,.greet-row .form-label{margin:0}
+input.form-control, .form-control{
+  height:40px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  box-shadow:none;
+  background:var(--surface-2);
+  color:var(--text);
+}
+.form-control::placeholder{ color:#95a0ad }
+.form-control:focus{
+  border-color:var(--wsu-crimson);
+  box-shadow:0 0 0 3px var(--ring);
+  outline:0;
+}
+
+/* Buttons */
+.btn{ border-radius:10px; font-weight:600 }
+.btn-primary{
+  background:var(--wsu-crimson);
+  border-color:var(--wsu-crimson);
+}
+.btn-primary:hover,.btn-primary:focus{
+  background:var(--wsu-crimson-dark);
+  border-color:var(--wsu-crimson-dark);
+}
+.btn-outline-light{
+  color:#e5e7eb;
+  border:1px solid #cbd5e1;
+  background:transparent;
+}
+.btn-outline-light:hover,.btn-outline-light:focus{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+}
+
+/* Optional visible outline for light-on-dark sections */
+.btn-crimson-outline{
+  color: var(--wsu-crimson);
+  border: 1px solid var(--wsu-crimson);
+  background: transparent;
+}
+.btn-crimson-outline:hover,
+.btn-crimson-outline:focus{ background: rgba(152,30,50,.12) }
+
+/* Card blocks */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px 16px;
+  margin:10px 0 16px;
+  color:var(--text);
+}
+.card h2,.card h3{ margin-top:0; color:#f3f4f6 }
+
+/* Greeting (now unused, safe to keep or remove) */
+.greet-msg{ margin-top:12px; font-weight:600 }
+
+/* ===== Overlay (dark) ===== */
+.overlay-root{
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 12, 0.65); /* darker glass */
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  backdrop-filter: blur(4px);
+}
+.overlay-card{
+  background: var(--surface);
+  color: var(--text);
+  width: min(960px, 92vw);
+  min-height: 60vh;
+  border-radius: 18px;
+  padding: 28px;
+  border:1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Disable background scrolling when overlay is open */
+body:has(.overlay-root){ overflow: hidden }
+
+/* Links */
+a{ color:#fda4af }           /* soft rose for visited/readability */
+a:hover{ color:#fecdd3 }     /* lighter on hover */
+
+
+
+/* ==============================
+   Cougar Dark Theme Overrides
+   ============================== */
+
+:root {
+  --wsu-crimson: #981E32;      /* Cougar Crimson */
+  --wsu-crimson-dark: #7a1828; /* Dark Crimson */
+  --wsu-gray: #5E6A71;         /* Cougar Gray */
+  --text: #f3f4f6;             /* near-white text */
+  --muted: #cbd5e1;            /* softer gray text */
+  --bg: #1c1f23;               /* dark gray background */
+  --surface: #2a2f34;          /* panel/card background */
+  --surface-2: #24292e;        /* deeper surface */
+  --ring: rgba(152, 30, 50, 0.5);
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+/* Body background */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--wsu-crimson) !important;
+  border-bottom: 2px solid var(--wsu-gray);
+}
+.navbar .navbar-brand,
+.navbar .nav-link { color: #fff !important; }
+.navbar .nav-link:hover,
+.navbar .nav-link:focus { opacity: 0.9; }
+
+/* Hero section */
+.hero {
+  background: linear-gradient(
+    135deg,
+    var(--surface) 0%,
+    var(--surface) 70%,
+    rgba(152,30,50,0.25) 100%
+  );
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 40px 32px;
+  margin: 18px 0 24px;
+}
+.hero .hero-content h1 {
+  color: #fff;
+  font-weight: 700;
+}
+.hero .subtext { color: var(--muted); }
+
+/* Buttons */
+.btn { border-radius: 10px; font-weight: 600; }
+.btn-primary {
+  background: var(--wsu-crimson);
+  border-color: var(--wsu-crimson);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--wsu-crimson-dark);
+  border-color: var(--wsu-crimson-dark);
+}
+.btn-outline-light {
+  color: var(--wsu-gray);
+  border: 1px solid var(--wsu-gray);
+  background: transparent;
+}
+.btn-outline-light:hover,
+.btn-outline-light:focus {
+  background: rgba(94,106,113,0.15);
+  color: #fff;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--wsu-gray);
+  border-radius: 12px;
+  padding: 20px;
+  color: var(--text);
+}
+.card h2, .card h3 { color: #fff; }
+
+/* Overlay */
+.overlay-root {
+  background: rgba(152, 30, 50, 0.35); /* crimson-tinted backdrop */
+  backdrop-filter: blur(6px);
+}
+.overlay-card {
+  background: var(--surface);
+  border: 1px solid var(--wsu-gray);
+  border-radius: 16px;
+  padding: 28px;
+  color: var(--text);
+}

@@ -11,13 +11,4 @@ server <- function(input, output, session) {
     output$displayLogin <- reactive(displayLogin())
     outputOptions(output, "displayLogin", suspendWhenHidden = FALSE)
 
-    # Simple greet interaction on Home tab
-    observeEvent(input$go, {
-      nm <- if (!is.null(input$name) && nzchar(input$name)) input$name else "Coug"
-      output$greet <- renderUI(
-        div(class = "greet-msg",
-            span(paste("Hello,", nm, "\U0001F44B"))) # 👋
-      )
-    })
-
 }
