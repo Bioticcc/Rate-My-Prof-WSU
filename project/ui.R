@@ -2,27 +2,32 @@
 #A simple,default look for the websites various UI elements, making them exist. 
 #A good way to think of server and ui is as backend and frontend files. Server handles backend, UI frontend.
 
-#here we make a theme object, setting it with various variables using bslib to get a default theme.
+# here we make a theme object using bslib.
+# Update to WSU-inspired branding and modern font.
 theme <- bslib::bs_theme(
   version   = 5,
-  bootswatch = "minty",
-  base_font = bslib::font_google("Open Sans"),
-  primary   = "#4A90E2",
-  bg        = "#D3D3D3",
-  fg        = "#2C3E50"
+  base_font = bslib::font_google("Inter"),
+  primary   = "#981E32",   # WSU crimson
+  secondary = "#7a1828",
+  bg        = "#f7f7f9",
+  fg        = "#1f2937"
 )
 
 # MAIN UI SECTION
 ui <- tagList(
   #this lets us add our style.css sheet to the rest of teh website through html tags.
   tags$head(
+    # Load Inter font from Google for cleaner typography
+    tags$link(rel = "preconnect", href = "https://fonts.gstatic.com", crossorigin = ""),
+    tags$link(rel = "stylesheet",
+              href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$script(HTML("console.log('Custom CSS loaded!');"))
   ),
   
   #creates a navigation bar that we can add too later. 
   navbarPage(
-    title    = "",
+    title    = "Rate-My-Prof-WSU",
     id       = "menu",
     selected = "home",
     theme    = theme, 
@@ -31,53 +36,62 @@ ui <- tagList(
     tabPanel(
       title = "Home",
       value = "home", #this is how we connect to  buttons later on
-      tags$div(
-        class = "header-box", #NOTE: these classes are what we will assign  values to in style.css to change their look!
-        style = "display: flex; align-items: center; gap: 20px; margin-bottom: 20px;",
-        tags$div(
-          style = "display: flex; flex-direction: column; gap: 6px;",
-          tags$h1("Rate My Prof (WSU)")
-        )
-      ),
-      tags$div(
-        class = "subHeader-box",
-        style = "display: flex; align-items: center; gap: 20px; margin-bottom: 10px;",
-        tags$div(
-          style = "display: flex; flex-direction: column; gap: 6px",
-          tags$h2(HTML("Using this webpage, you can find your upcoming professors and see their reviews,<br>star ratings, 
-          and more!<br><br>If you have a current professor you would like to write a review for, please make an account or login to write a review!"))
-        )
-      ),
-      actionButton( #here we are adding a button! we can then use server.R to connect it to specific actions by matchingthe inputID
-        inputId = "loginB",
-        label = "Register/Login",
-        class = "btn"
-       )
+      # Hero section with modern look
+      div(class = "hero",
+          div(class = "hero-content",
+              h1("Find and share insights on WSU professors"),
+              p(class = "subtext",
+                "Search, rate, and review to help Cougs pick the right courses."),
+              div(class = "greet-row",
+                  textInput("name", NULL, placeholder = "Your name"),
+                  actionButton("go", "Greet", class = "btn btn-primary"),
+                  actionButton("loginB", "Register / Login", class = "btn btn-outline-light")
+              ),
+              uiOutput("greet")
+          )
+      )
     ),
 
     tabPanel(
       title = "Reviews of the Day!",
       value = "reviewsOfTheDay",
-      tags$div(
-        class = "header-box", 
-        style = "display: flex; align-items: center; gap: 20px; margin-bottom: 20px;",
-        tags$div(
-          style = "display: flex; flex-direction: column; gap: 6px;",
-          tags$h1("Todays TOP reviews!") #once we get data collection up and running, this would be the reviews with the most clicks
-        )
-      ),
+      div(class = "card",
+          h2("Today's Top Reviews"),
+          p("Once data is available, the most engaged reviews will appear here.")
+      )
     ),
 
     tabPanel(
       title = "Professors",
       value = "professors",
-      tags$div(
-        class = "header-box", 
-        style = "display: flex; align-items: center; gap: 20px; margin-bottom: 20px;",
-        tags$div(
-          style = "display: flex; flex-direction: column; gap: 6px;",
-          tags$h1("Professors and their reviews!") #this will act as the main way to find reviews other then searching. Will list all current active profs, and their reviews
-        )
+      div(class = "card",
+          h2("Professors and their reviews"),
+          p("This tab will list active professors and their reviews. (Coming soon)")
+      )
+    ),
+
+    # About tab
+    tabPanel(
+      title = "About",
+      value = "about",
+      div(class = "card",
+          h2("About Rate-My-Prof-WSU"),
+          p("A community-driven tool for WSU students to find the right classes with confidence."),
+          p("This project is not affiliated with Washington State University but aims to follow WSU-inspired branding.")
+      )
+    ),
+
+    # Feedback tab
+    tabPanel(
+      title = "Feedback",
+      value = "feedback",
+      div(class = "card",
+          h2("Feedback"),
+          p("Have ideas or found a bug? Reach out!"),
+          tags$ul(
+            tags$li(HTML("Open an issue on GitHub: <a href='https://github.com/Bioticcc/Rate-My-Prof-WSU' target='_blank'>Repo</a>")),
+            tags$li(HTML("Email: <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a>"))
+          )
       )
     )
   ), #end of navBarPage

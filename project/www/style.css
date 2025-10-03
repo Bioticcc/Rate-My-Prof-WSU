@@ -10,7 +10,7 @@
 .overlay-root {
   position: fixed;
   inset: 0;
-  background: rgba(163, 169, 175, 0.65); 
+  background: rgba(152, 30, 50, 0.25); /* slightly crimson-tinted */
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -20,14 +20,15 @@
 
 /* Larger centered lightbox */
 .overlay-card {
-  background: #9b9b9b;
-  color: #111;
+  background: #ffffff;
+  color: var(--text);
   width: 60%;              
   max-width: 1200px;       /* cap it so it doesn’t stretch on huge screens */
   min-height: 70vh;        /* make it tall like a real page */
   border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  padding: 32px;
+  border:1px solid #ececec;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   justify-content: center; /* centers text/buttons inside */
@@ -38,3 +39,63 @@
 body:has(.overlay-root) {
   overflow: hidden;
 }
+/*
+  Global branding and components (WSU-inspired)
+  - Adds CSS variables, typography, navbar, hero, inputs, buttons, and cards.
+  - Preserves existing overlay styles below.
+*/
+
+/* Design tokens */
+:root{
+  --wsu-crimson:#981E32;
+  --wsu-crimson-dark:#7a1828;
+  --text:#1f2937;
+  --muted:#5e6a71;
+  --bg:#f7f7f9;
+  --surface:#ffffff;
+  --ring:rgba(152,30,50,0.35);
+}
+
+html,body{height:100%}
+body{
+  font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Navbar (Bootstrap 5) */
+.navbar{background-color:var(--wsu-crimson)!important}
+.navbar .navbar-brand,.navbar .nav-link{color:#fff!important}
+.navbar .nav-link:hover,.navbar .nav-link:focus{color:#fff!important;opacity:.9}
+
+/* Hero */
+.hero{
+  background:linear-gradient(135deg, #fff 0%, #fff 65%, rgba(152,30,50,0.08) 100%);
+  border:1px solid #ececec;
+  border-radius:14px;
+  padding:32px 28px;
+  margin:18px 0 24px;
+}
+.hero .hero-content h1{margin:0 0 6px;font-weight:700;line-height:1.25}
+.hero .subtext{color:var(--muted);margin:0 0 18px}
+
+/* Inline input + buttons */
+.greet-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.greet-row .form-group,.greet-row .form-label{margin:0}
+.greet-row input.form-control{height:40px;border-radius:10px;border:1px solid #e1e1e1;box-shadow:none}
+.greet-row input.form-control:focus{border-color:var(--wsu-crimson);box-shadow:0 0 0 3px var(--ring);outline:0}
+
+/* Primary + outline buttons */
+.btn-primary{background:var(--wsu-crimson);border-color:var(--wsu-crimson);border-radius:10px;padding:8px 14px;font-weight:600}
+.btn-primary:hover,.btn-primary:focus{background:var(--wsu-crimson-dark);border-color:var(--wsu-crimson-dark)}
+.btn-outline-light{color:#fff;border-color:#fff;border-radius:10px}
+.btn-outline-light:hover,.btn-outline-light:focus{background:rgba(255,255,255,.15);color:#fff}
+
+/* Greeting text */
+.greet-msg{margin-top:12px;font-weight:600}
+
+/* Card blocks */
+.card{background:var(--surface);border:1px solid #ececec;border-radius:12px;padding:18px 16px;margin:10px 0 16px}
+.card h2,.card h3{margin-top:0}
