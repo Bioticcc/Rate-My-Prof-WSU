@@ -1,62 +1,48 @@
 # Sprint x Report 
 Video Link: 
 ## What's New (User Facing)
- * Feature 1 or Bug Fix 1
- * Feature 2 or Bug Fix 2
- * Feature n or Bug Fix n
+ * Feature 1: Base framework of shinyApp website, with global, server, ui and style.
+ * Feature 2: Simple login system, allows users to login/make accounts with the site
+ * Feature 3: Stylized navigation bar to provide better feel of website
+ * Feature 4: Stylized homepage with placeholders for future reference
+ * FEature 5: User profiles, so login system actually shows you something
 
 ## Work Summary (Developer Facing)
-Provide a one paragraph synposis of what your team accomplished this sprint. Don't repeat the "What's New" list of features. Instead, help the instructor understand how you went about the work described there, any barriers you overcame, and any significant learnings for your team.
+ We began the sprint with just simple planning and idea phases. We used AI to generate premade website UI designs to get an idea for future improvements we could make, and to get an understanding of what looks unnatural or bad for design choices. Unfortunately, we then sort of forgot the sprint was happening until the last week, at witch point exams were happening. This is not to give excuses, to be clear, just to highlight the reason for this being somewhat rushed. We decided then that we needed to set up a few things for the website, before other projects could begin. For example, the website framework needed to be done before the UI stylizing, and the login system needed to be done before we could add user profiles. We did the tasks in that order, meeting throughout the week to ensure things got done.
 
 ## Unfinished Work
-If applicable, explain the work you did not finish in this sprint. For issues/user stories in the current sprint that have not been closed, (a) any progress toward completion of the issues has been clearly tracked (by checking the checkboxes of  acceptance criteria), (b) a comment has been added to the issue to explain why the issue could not be completed (e.g., "we ran out of time" or "we did not anticipate it would be so much work"), and (c) the issue is added to a subsequent sprint, so that it can be addressed later.
+The login system was unfinished in the video recording, but has since been completed. As has the user profile. Neither were in the demo video however, so images will be included in the document we submit. 
 
 ## Completed Issues/User Stories
 Here are links to the issues that we completed in this sprint:
+ * (https://github.com/users/Bioticcc/projects/5/views/1?pane=issue&itemId=131070709&issue=Bioticcc%7CRate-My-Prof-WSU%7C9)
+ * (https://github.com/users/Bioticcc/projects/5/views/1?pane=issue&itemId=131070866&issue=Bioticcc%7CRate-My-Prof-WSU%7C10)
+ * (https://github.com/users/Bioticcc/projects/5/views/1?pane=issue&itemId=131071030&issue=Bioticcc%7CRate-My-Prof-WSU%7C12)
+ * (https://github.com/users/Bioticcc/projects/5/views/1?pane=issue&itemId=131070978&issue=Bioticcc%7CRate-My-Prof-WSU%7C11)
+ * (https://github.com/users/Bioticcc/projects/5/views/1?pane=issue&itemId=132119205&issue=Bioticcc%7CRate-My-Prof-WSU%7C23)
 
- * URL of issue 1
- * URL of issue 2
- * URL of issue n
-
- Desirables (Remove this section when you save the file):
-  * Each issue should be assigned to a milestone
-  * Each completed issue should be assigned to a pull request
-  * Each completed pull request should include a link to a "Before and After" video
-  * All team members who contributed to the issue should be assigned to it on GitHub
-  * Each issue should be assigned story points using a label
-  * Story points contribution of each team member should be indicated in a comment
- 
  ## Incomplete Issues/User Stories
  Here are links to issues we worked on but did not complete in this sprint:
- 
- * URL of issue 1 <<One sentence explanation of why issue was not completed>>
- * URL of issue 2 <<One sentence explanation of why issue was not completed>>
- * URL of issue n <<One sentence explanation of why issue was not completed>>
- 
- Examples of explanations (Remove this section when you save the file):
-  * "We ran into a complication we did not anticipate (explain briefly)." 
-  * "We decided that the feature did not add sufficient value for us to work on it in this sprint (explain briefly)."
-  * "We could not reproduce the bug" (explain briefly).
-  * "We did not get to this issue because..." (explain briefly)
 
 ## Code Files for Review
 Please review the following code files, which were actively developed during this sprint, for quality:
- * [Name of code file 1](https://github.com/your_repo/file_extension)
- * [Name of code file 2](https://github.com/your_repo/file_extension)
- * [Name of code file 3](https://github.com/your_repo/file_extension)
+ * https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/server.R
+ * https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/ui.R
+ * https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/global.R
+ * https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/www/style.css
  
 ## Retrospective Summary
 Here's what went well:
-  * Item 1
-  * Item 2
-  * Item x
+  * Once we got to work, things got done
+  * UI looks great! using a style.css has helped things along
  
 Here's what we'd like to improve:
-   * Item 1
-   * Item 2
-   * Item x
+   * proactivity
+   * planning
+   * group work time
   
 Here are changes we plan to implement in the next sprint:
-   * Item 1
-   * Item 2
+   * get webscraping up and runnning
+   * list of professors, courses, and review publishing
    * Item x
+
