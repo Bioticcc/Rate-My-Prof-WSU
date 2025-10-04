@@ -35,6 +35,44 @@
   text-align: center;      /* center headings & text */
 }
 
+/* Ensure overlay content keeps the light theme even when the app switches palettes */
+.overlay-card,
+.overlay-card label,
+.overlay-card h2,
+.overlay-card h3,
+.overlay-card p {
+  color: #1f2937 !important;
+}
+
+.overlay-card .form-control,
+.overlay-card input.form-control {
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  box-shadow: none;
+}
+
+.overlay-card .form-control::placeholder {
+  color: #6b7280;
+}
+
+.overlay-card .form-control:focus {
+  border-color: #981E32;
+  box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.25);
+  outline: 0;
+}
+
+.overlay-card .btn-primary {
+  background: #981E32;
+  border-color: #981E32;
+}
+
+.overlay-card .btn-primary:hover,
+.overlay-card .btn-primary:focus {
+  background: #7a1828;
+  border-color: #7a1828;
+}
+
 /* Disable background scrolling when overlay is open */
 body:has(.overlay-root) {
   overflow: hidden;

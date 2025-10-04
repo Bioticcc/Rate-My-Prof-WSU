@@ -17,6 +17,13 @@
 #when you want to close the app, click on terminal and press: (Ctrl C)
 #close the newly opened browser tab!
 
+# -------- global.R --------
+
+# General options (optional but handy)
+options(shiny.autoreload = TRUE)
+options(shiny.reactlog = FALSE)
+# If you use bslib Google fonts:
+# options(bslib.fonts.download = "yes")
 
 # Core
 library(shiny)
@@ -29,12 +36,12 @@ library(shinyvalidate)
 library(DT)
 
 # Authentication
-library(shinymanager)  
-       
+library(shinymanager)
+
 # Data / persistence
 library(DBI)
-library(RSQLite)      
-library(RPostgres)    
+library(RSQLite)
+# library(RPostgres)   # keep only if you actually use Postgres
 library(pool)
 library(dplyr)
 library(dbplyr)
@@ -44,13 +51,15 @@ library(tidyr)
 library(readr)
 library(jsonlite)
 
-# Plots (optional)
+# Plots (if you use them)
 library(ggplot2)
 library(plotly)
 
-# Load ui and server definitions from separate files
-source("ui.R")
-source("server.R")
+# ---- Globals / config / helpers go here ----
+APP_TITLE <- "Rate-My-Prof-WSU"
 
-# Run the app
-shinyApp(ui = ui, server = server)
+# Example: paths, constants, small helper functions
+data_dir <- "data"
+
+# Example helper (available in both ui.R and server.R)
+is_admin <- function(auth) isTRUE(auth$user_info$admin)

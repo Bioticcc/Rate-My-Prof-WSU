@@ -3,7 +3,6 @@
 #A good way to think of server and ui is as backend and frontend files. Server handles backend, UI frontend.
 
 # here we make a theme object using bslib.
-# Update to WSU-inspired branding and modern font.
 theme <- bslib::bs_theme(
   version   = 5,
   base_font = bslib::font_google("Inter"),
@@ -37,7 +36,7 @@ ui <- tagList(
       title = "Home",
       value = "home",
 
-      # Hero section
+      # Main hero section
       div(class = "hero",
           div(class = "hero-content",
               h1("Find and share insights on WSU professors"),
@@ -114,17 +113,23 @@ ui <- tagList(
   ), #end of navBarPage
 
   conditionalPanel(
-  condition = "output.displayLogin",   
-  tags$div( #we are adding this little tags$div to make this page act as an overlay on top of the site
-    class = "overlay-root", #we use style.css to set this overlay-root's parameters
+  condition = "output.displayLogin",
+  tags$div(
+    class = "overlay-root",
     tags$div(
-      class = "overlay-card", #same with this
+      class = "overlay-card",
       tags$h2("Register / Login"),
-      tags$p("Here you can register or log in using the shinyManager library!"),
+      tags$p("Use your account to sign in."),
+      shinymanager::auth_ui(
+        id = "login",
+        tags_top = div(tags$h3("Rate-My-Prof-WSU")),
+        tags_bottom = div(tags$small("Forgot password? Contact admin."))
+      ),
       actionButton("backHome", "Back to Home", class = "btn btn-primary")
     )
   )
 )
+
 
 
   
