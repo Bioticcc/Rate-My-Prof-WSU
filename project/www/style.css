@@ -376,3 +376,109 @@ body {
   padding: 28px;
   color: var(--text);
 }
+
+/* ==============================
+   Courses tab
+   ============================== */
+.courses-tab{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin:10px 0 20px;
+}
+.courses-intro p{ margin-bottom:0; color:var(--muted); }
+.courses-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:16px;
+  align-items:flex-end;
+}
+.courses-filters .courses-search,
+.courses-filters .courses-sort{
+  flex:1;
+  min-width:220px;
+}
+.courses-filters .form-group{ margin-bottom:0; width:100%; }
+.courses-list-card{
+  max-height:60vh;
+  overflow-y:auto;
+  padding:20px;
+}
+.courses-grid{
+  display:grid;
+  gap:16px;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+}
+.course-card{
+  margin:0;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  border:1px solid var(--border);
+  background:var(--surface);
+}
+.course-card:hover,
+.course-card:focus{
+  transform:translateY(-4px);
+  box-shadow:0 12px 24px rgba(0,0,0,0.25);
+  border-color:var(--wsu-crimson);
+}
+.course-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:0.85rem;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.course-code{
+  font-weight:600;
+  color:var(--text);
+}
+.course-dept{
+  background:rgba(152,30,50,0.18);
+  color:var(--text);
+  padding:2px 10px;
+  border-radius:999px;
+  font-size:0.75rem;
+}
+.course-title{
+  margin:0 0 6px;
+  font-size:1.05rem;
+  color:var(--text);
+}
+.course-description{
+  margin-bottom:12px;
+  color:var(--muted);
+  font-size:0.9rem;
+}
+.course-stats{
+  display:flex;
+  gap:12px;
+  font-size:0.85rem;
+  color:var(--muted);
+}
+.course-empty{
+  text-align:center;
+}
+.course-empty h3{
+  margin-bottom:8px;
+}
+.course-detail-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+  margin:12px 0;
+  font-weight:600;
+}
+.course-detail-note{
+  color:var(--muted);
+  font-size:0.9rem;
+}
+@media (max-width:768px){
+  .courses-list-card{ max-height:none; }
+  .course-card:hover,
+  .course-card:focus{
+    transform:none;
+    box-shadow:0 6px 16px rgba(0,0,0,0.2);
+  }
+}
