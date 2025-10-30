@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Dr. Alicia Morgan",
+    "department": "Computer Science",
+    "email": "alicia.morgan@wsu.edu",
+    "bio": "Focuses on software engineering practices and mentors senior capstone teams."
+  },
+  {
+    "name": "Prof. Daniel Lee",
+    "department": "Mathematics",
+    "email": "daniel.lee@wsu.edu",
+    "bio": "Specializes in applied statistics with an emphasis on student success programs."
+  },
+  {
+    "name": "Dr. Priya Shah",
+    "department": "Chemistry",
+    "email": "priya.shah@wsu.edu",
+    "bio": "Leads undergraduate research opportunities in organic chemistry."
+  }
+]

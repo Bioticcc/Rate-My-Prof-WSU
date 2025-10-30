@@ -23,6 +23,7 @@ ui <- tagList(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$script(HTML("console.log('Custom CSS loaded!');"))
   ),
+  uiOutput("user_profile_header"),
   
   #creates a navigation bar that we can add too later. 
   navbarPage(
@@ -43,7 +44,9 @@ ui <- tagList(
               p(class = "subtext",
                 "Search, rate, and review to help Cougs pick the right courses."),
               div(
-                actionButton("loginB", "Register / Login", class = "btn btn-primary btn-lg")
+                class = "hero-actions",
+                actionButton("loginB", "Register / Login", class = "btn btn-primary btn-lg"),
+                actionButton("open_home_review", "Write a Review", class = "btn btn-outline-light btn-lg write-review-btn")
               )
           )
       ),
@@ -80,9 +83,17 @@ ui <- tagList(
     tabPanel(
       title = "Professors",
       value = "professors",
-      div(class = "card",
+      div(
+        class = "professors-tab",
+        div(
+          class = "card professors-intro",
           h2("Professors and their reviews"),
-          p("This tab will list active professors and their reviews. (Coming soon)")
+          p("Browse WSU faculty, explore quick bios, and jump into writing a review for an instructor.")
+        ),
+        div(
+          class = "card professors-list-card",
+          uiOutput("professors_list", container = div, class = "professors-grid")
+        )
       )
     ),
 
@@ -94,25 +105,25 @@ ui <- tagList(
         div(
           class = "card courses-intro",
           h2("Explore WSU Courses"),
-          p("Browse available classes, search by name or department, and tap a course card to see the mock details.")
-        ),
-        div(
-          class = "card courses-filters",
+          p("Browse available classes, search by name or department, and tap a course card to see the mock details."),
           div(
-            class = "courses-search",
-            textInput(
-              inputId   = "course_search",
-              label     = "Search courses",
-              placeholder = "Search by course code, title, or department"
-            )
-          ),
-          div(
-            class = "courses-sort",
-            selectInput(
-              inputId = "course_sort",
-              label   = "Sort by",
-              choices = c("Course Code" = "course_id", "Title" = "title"),
-              selected = "course_id"
+            class = "courses-intro-controls",
+            div(
+              class = "courses-search",
+              textInput(
+                inputId   = "course_search",
+                label     = "Search courses",
+                placeholder = "Search by course code, title, or department"
+              )
+            ),
+            div(
+              class = "courses-sort",
+              selectInput(
+                inputId = "course_sort",
+                label   = "Sort by",
+                choices = c("Course Code" = "course_id", "Title" = "title"),
+                selected = "course_id"
+              )
             )
           )
         ),
@@ -155,13 +166,12 @@ ui <- tagList(
     class = "overlay-root",
     tags$div(
       class = "overlay-card",
-      tags$h2("Register / Login"),
-      tags$p("Use your account to sign in."),
-      shinymanager::auth_ui(
-        id = "login",
-        tags_top = div(tags$h3("Rate-My-Prof-WSU")),
-        tags_bottom = div(tags$small("Forgot password? Contact admin."))
+      tags$div(
+        class = "auth-modal-header",
+        tags$h2("Account Access"),
+        uiOutput("auth_modal_tabs")
       ),
+      uiOutput("auth_modal_body"),
       actionButton("backHome", "Back to Home", class = "btn btn-primary")
     )
   )
