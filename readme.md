@@ -89,6 +89,16 @@ shiny::runApp(".")
 
 ---
 
+## 📚 Courses Tab
+
+- Launch the app with `shiny::runApp(".")` and open the `Courses` tab to browse the mock catalog.
+- Course data lives in `project/data/courses_mock.json`; replace this file when a live data source is ready.
+- The search bar filters by course code, title, or department, and the sort menu toggles between code and title ordering.
+- Selecting a course card opens a detail modal with the mock description, average rating, and review count.
+- All entries are placeholder information for prototyping and do not reflect real WSU course reviews.
+
+---
+
 ## 🔧 Git + GitHub Setup
 
 ### Install Git

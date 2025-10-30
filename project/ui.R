@@ -86,6 +86,43 @@ ui <- tagList(
       )
     ),
 
+    tabPanel(
+      title = "Courses",
+      value = "courses",
+      div(
+        class = "courses-tab",
+        div(
+          class = "card courses-intro",
+          h2("Explore WSU Courses"),
+          p("Browse available classes, search by name or department, and tap a course card to see the mock details.")
+        ),
+        div(
+          class = "card courses-filters",
+          div(
+            class = "courses-search",
+            textInput(
+              inputId   = "course_search",
+              label     = "Search courses",
+              placeholder = "Search by course code, title, or department"
+            )
+          ),
+          div(
+            class = "courses-sort",
+            selectInput(
+              inputId = "course_sort",
+              label   = "Sort by",
+              choices = c("Course Code" = "course_id", "Title" = "title"),
+              selected = "course_id"
+            )
+          )
+        ),
+        div(
+          class = "card courses-list-card",
+          uiOutput("courses_list", container = div, class = "courses-grid")
+        )
+      )
+    ),
+
     # About tab
     tabPanel(
       title = "About",

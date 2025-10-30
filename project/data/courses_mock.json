@@ -1,0 +1,90 @@
+[
+  {
+    "course_id": "CPT_S 121",
+    "title": "Program Design and Development",
+    "department": "Computer Science",
+    "description": "Fundamentals of problem solving and algorithm development using C/C++ with an emphasis on decomposition and testing.",
+    "average_rating": 4.2,
+    "review_count": 34
+  },
+  {
+    "course_id": "CPT_S 223",
+    "title": "Advanced Data Structures",
+    "department": "Computer Science",
+    "description": "Analysis and implementation of data structures including trees, hash tables, and graphs with applications in software design.",
+    "average_rating": 4.4,
+    "review_count": 28
+  },
+  {
+    "course_id": "BIO 220",
+    "title": "Introductory Cell Biology",
+    "department": "Biological Sciences",
+    "description": "Explores cellular structure, metabolism, genetics, and signaling with an applied laboratory component.",
+    "average_rating": 3.9,
+    "review_count": 17
+  },
+  {
+    "course_id": "MATH 140",
+    "title": "Calculus for Life Sciences",
+    "department": "Mathematics",
+    "description": "Differential and integral calculus applications for students in life sciences with emphasis on modeling.",
+    "average_rating": 3.7,
+    "review_count": 22
+  },
+  {
+    "course_id": "PSYCH 105",
+    "title": "Introductory Psychology",
+    "department": "Psychology",
+    "description": "Survey of human behavior, cognition, and emotion with contemporary research examples.",
+    "average_rating": 4.0,
+    "review_count": 45
+  },
+  {
+    "course_id": "ENGL 101",
+    "title": "College Composition",
+    "department": "English",
+    "description": "Focus on rhetorical strategies, critical reading, and revision to develop effective academic writing skills.",
+    "average_rating": 4.1,
+    "review_count": 52
+  },
+  {
+    "course_id": "HIST 105",
+    "title": "Roots of Contemporary Issues",
+    "department": "History",
+    "description": "Global historical themes shaping current issues with emphasis on primary sources and analytical writing.",
+    "average_rating": 3.8,
+    "review_count": 31
+  },
+  {
+    "course_id": "ECONS 101",
+    "title": "Fundamentals of Microeconomics",
+    "department": "Economics",
+    "description": "Introduction to microeconomic theory covering supply and demand, market structures, and consumer behavior.",
+    "average_rating": 3.6,
+    "review_count": 29
+  },
+  {
+    "course_id": "CHEM 345",
+    "title": "Organic Chemistry I",
+    "department": "Chemistry",
+    "description": "Structure, nomenclature, reactions, and mechanisms of organic compounds with laboratory applications.",
+    "average_rating": 3.4,
+    "review_count": 26
+  },
+  {
+    "course_id": "SOE 210",
+    "title": "Introduction to GIScience",
+    "department": "School of the Environment",
+    "description": "Foundations of geographic information systems, spatial analysis, and cartographic design using modern GIS tools.",
+    "average_rating": 4.3,
+    "review_count": 19
+  },
+  {
+    "course_id": "NURS 322",
+    "title": "Nursing Pharmacology",
+    "department": "Nursing",
+    "description": "Pharmacological principles for nursing practice with emphasis on safe medication administration and patient education.",
+    "average_rating": 4.5,
+    "review_count": 24
+  }
+]
