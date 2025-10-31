@@ -1,5 +1,5 @@
 # Sprint x Report 
-Video Link: 
+Video Link: https://youtu.be/0rQQdSfcjJk
 ## What's New (User Facing)
  * Fixed login system
  * Initial Course list (not scraped yet, just samples so we can test review making)
@@ -52,3 +52,4 @@ Here are changes we plan to implement in the next sprint:
    * UI improvements
 
    * Item x
+
