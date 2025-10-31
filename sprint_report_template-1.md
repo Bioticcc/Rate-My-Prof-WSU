@@ -1,62 +1,54 @@
 # Sprint x Report 
 Video Link: 
 ## What's New (User Facing)
- * Feature 1 or Bug Fix 1
- * Feature 2 or Bug Fix 2
- * Feature n or Bug Fix n
+ * Fixed login system
+ * Initial Course list (not scraped yet, just samples so we can test review making)
+ * Initial Prof list
+ * Microanimations
+ * light/dark mode
+ * shading
 
 ## Work Summary (Developer Facing)
-Provide a one paragraph synposis of what your team accomplished this sprint. Don't repeat the "What's New" list of features. Instead, help the instructor understand how you went about the work described there, any barriers you overcame, and any significant learnings for your team.
+We started with implementing samples of the course and professor lists so we could make the review writing system properly setup. We fixed the log in system, and added an actual user profile section that lets users see their published reviews, password, username, etc. We added a review writing system that lets people write reviews from 3 places. Starting a review from scratch from the home page, starting a professor specific review from the professor tab by clicking the review button on a specified prof, and from the course list, the same way as the professor.
 
 ## Unfinished Work
-If applicable, explain the work you did not finish in this sprint. For issues/user stories in the current sprint that have not been closed, (a) any progress toward completion of the issues has been clearly tracked (by checking the checkboxes of  acceptance criteria), (b) a comment has been added to the issue to explain why the issue could not be completed (e.g., "we ran out of time" or "we did not anticipate it would be so much work"), and (c) the issue is added to a subsequent sprint, so that it can be addressed later.
+We did not fully get the course and prof lists scraped as we initially intended, instead focusing on making them work with the review writing. The user profile system is somewhat screwed up visually, as teh style.css was acting odd at the end. Will be fixed, alongside other simple UI fixes later on.
 
 ## Completed Issues/User Stories
 Here are links to the issues that we completed in this sprint:
+ * URL of issue 1 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/23
+ * URL of issue 2 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/25
+ * URL of issue 3 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/20
+ * URL of issue 3 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/21
+ * URL of issue 4 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/26
+ * URL of issue 5 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/10
+ * URL of issue 6 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/16
 
- * URL of issue 1
- * URL of issue 2
- * URL of issue n
+ ## Incomplete Issues/User Stories 
+ * URL of issue 1 - https://github.com/Bioticcc/Rate-My-Prof-WSU/issues/14 - Still deciding wether or not to do student ID or SSO. at this point we got to do student ID though, so going to implement that next time.
 
- Desirables (Remove this section when you save the file):
-  * Each issue should be assigned to a milestone
-  * Each completed issue should be assigned to a pull request
-  * Each completed pull request should include a link to a "Before and After" video
-  * All team members who contributed to the issue should be assigned to it on GitHub
-  * Each issue should be assigned story points using a label
-  * Story points contribution of each team member should be indicated in a comment
- 
- ## Incomplete Issues/User Stories
- Here are links to issues we worked on but did not complete in this sprint:
- 
- * URL of issue 1 <<One sentence explanation of why issue was not completed>>
- * URL of issue 2 <<One sentence explanation of why issue was not completed>>
- * URL of issue n <<One sentence explanation of why issue was not completed>>
- 
- Examples of explanations (Remove this section when you save the file):
-  * "We ran into a complication we did not anticipate (explain briefly)." 
-  * "We decided that the feature did not add sufficient value for us to work on it in this sprint (explain briefly)."
-  * "We could not reproduce the bug" (explain briefly).
-  * "We did not get to this issue because..." (explain briefly)
 
 ## Code Files for Review
 Please review the following code files, which were actively developed during this sprint, for quality:
- * [Name of code file 1](https://github.com/your_repo/file_extension)
- * [Name of code file 2](https://github.com/your_repo/file_extension)
- * [Name of code file 3](https://github.com/your_repo/file_extension)
+ * UI.R https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/ui.R
+ * Server.R https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/server.R
+ * Global.R https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/global.R
+ * Style.css https://github.com/Bioticcc/Rate-My-Prof-WSU/blob/main/project/www/style.css
  
 ## Retrospective Summary
 Here's what went well:
-  * Item 1
-  * Item 2
-  * Item x
+  * The sample course and prof lists look great! as soon as we have the full course list to add.
+  * Log in system succesful, worked when testing between multiple machines, so thats great
+  * Reviews were postable, not viewable between machines but mainly due to the site not actually being up/persistent yet. Logins are stored locally, so those ARE persistent.
  
 Here's what we'd like to improve:
-   * Item 1
-   * Item 2
-   * Item x
+   * Random UI shenanigans deciding to act funky between commits for little to no reason
+   * Some text showing as the same color as its backgrround when swapping between light and dark mode
+   * Getting that scraping done!
   
 Here are changes we plan to implement in the next sprint:
-   * Item 1
-   * Item 2
+   * FUlly scraped list of both course and prof lists directly from WSU website
+   * Review rating system
+   * UI improvements
+
    * Item x
