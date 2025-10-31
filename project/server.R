@@ -252,10 +252,21 @@ server <- function(input, output, session) {
 
   output$user_profile_header <- renderUI({
     reviews_updated()
+
+    dark_toggle_btn <- tags$button(
+      id = "darkModeToggle",
+      type = "button",
+      class = "btn btn-outline-light btn-sm dark-mode-toggle",
+      `aria-pressed` = "false",
+      tags$span(class = "toggle-icon", "🌙"),
+      tags$span(class = "toggle-label", "Dark Mode")
+    )
+
     if (!isTRUE(auth_result())) {
       return(
         div(
           class = "user-profile-header",
+          dark_toggle_btn,
           actionButton("open_signup_header", "Sign up", class = "btn btn-primary btn-sm"),
           actionButton("open_auth_header", "Login", class = "btn btn-outline-light btn-sm")
         )
@@ -329,7 +340,11 @@ server <- function(input, output, session) {
       )
     )
 
-    div(class = "user-profile-header logged-in", dropdown)
+    div(
+      class = "user-profile-header logged-in",
+      dark_toggle_btn,
+      dropdown
+    )
   })
 
   observeEvent(input$view_profile, {

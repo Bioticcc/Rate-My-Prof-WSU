@@ -21,7 +21,99 @@ ui <- tagList(
     tags$link(rel = "stylesheet",
               href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-    tags$script(HTML("console.log('Custom CSS loaded!');"))
+    tags$script(HTML("console.log('Custom CSS loaded!');")),
+    tags$script(HTML("
+      (function() {
+        var storageKey = 'wsu-rmp-dark-mode';
+
+        function getPreference() {
+          var stored = null;
+          try {
+            stored = localStorage.getItem(storageKey);
+          } catch (err) {
+            stored = null;
+          }
+          if (stored === null) {
+            stored = (window.matchMedia &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'true' : 'false';
+          }
+          return stored;
+        }
+
+        function applyPreferenceToBody() {
+          var body = document.body;
+          if (!body) return;
+          if (getPreference() === 'true') {
+            body.classList.add('dark-mode');
+          } else {
+            body.classList.remove('dark-mode');
+          }
+        }
+
+        function syncToggle(toggle) {
+          if (!toggle) return;
+          var body = document.body;
+          var isDark = body.classList.contains('dark-mode');
+          toggle.classList.toggle('active', isDark);
+          toggle.setAttribute('aria-pressed', isDark);
+          var labelNode = toggle.querySelector('.toggle-label');
+          if (labelNode) {
+            labelNode.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+          }
+          var iconNode = toggle.querySelector('.toggle-icon');
+          if (iconNode) {
+            iconNode.textContent = isDark ? '☀️' : '🌙';
+          }
+        }
+
+        function bindToggle(toggle) {
+          if (!toggle || toggle.dataset.bound === 'true') return;
+          toggle.dataset.bound = 'true';
+          syncToggle(toggle);
+          toggle.addEventListener('click', function() {
+            var body = document.body;
+            body.classList.toggle('dark-mode');
+            var isDark = body.classList.contains('dark-mode');
+            try {
+              localStorage.setItem(storageKey, isDark ? 'true' : 'false');
+            } catch (err) {
+              /* noop */
+            }
+            syncToggle(toggle);
+          });
+        }
+
+        function initialiseToggle() {
+          applyPreferenceToBody();
+          bindToggle(document.getElementById('darkModeToggle'));
+        }
+
+        if (document.readyState !== 'loading') {
+          applyPreferenceToBody();
+        } else {
+          document.addEventListener('DOMContentLoaded', applyPreferenceToBody, { once: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+          initialiseToggle();
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              var mutation = mutations[i];
+              if (!mutation.addedNodes) continue;
+              for (var j = 0; j < mutation.addedNodes.length; j++) {
+                var node = mutation.addedNodes[j];
+                if (node.nodeType !== 1) continue;
+                if (node.id === 'darkModeToggle' || (node.querySelector && node.querySelector('#darkModeToggle'))) {
+                  bindToggle(document.getElementById('darkModeToggle'));
+                  return;
+                }
+              }
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        });
+      })();
+    "))
   ),
   uiOutput("user_profile_header"),
   
