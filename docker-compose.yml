@@ -1,0 +1,37 @@
+services:
+  app:
+    image: rmp-shiny:latest
+    build: .
+    ports:
+      - "3838:3838"
+    environment:
+      SHINY_HOST: 0.0.0.0
+      SHINY_PORT: 3838
+      RMP_DATA_DIR: /app/project/data
+      RMP_REVIEWS_DB_PATH: /app/project/data/reviews.sqlite
+      RMP_CREDENTIALS_DB_PATH: /app/project/data/credentials.sqlite
+      RMP_CREDENTIALS_PASSPHRASE: change-this-passphrase
+    volumes:
+      - rmp_data:/app/project/data
+    restart: unless-stopped
+
+  app-dev:
+    profiles: ["dev"]
+    image: rmp-shiny:dev
+    build: .
+    ports:
+      - "3838:3838"
+    environment:
+      SHINY_HOST: 0.0.0.0
+      SHINY_PORT: 3838
+      RMP_DATA_DIR: /app/project/data
+      RMP_REVIEWS_DB_PATH: /app/project/data/reviews.sqlite
+      RMP_CREDENTIALS_DB_PATH: /app/project/data/credentials.sqlite
+      RMP_CREDENTIALS_PASSPHRASE: change-this-passphrase
+    volumes:
+      - ./project:/app/project
+      - rmp_data:/app/project/data
+    restart: unless-stopped
+
+volumes:
+  rmp_data:

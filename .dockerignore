@@ -1,0 +1,13 @@
+.git
+.gitignore
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user
+*.Rproj
+project/.Rhistory
+project/.RData
+project/credentials.sqlite
+project/data/*.sqlite
+project/data/*.db
+project/data/*.rds

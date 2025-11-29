@@ -60,13 +60,19 @@ library(plotly)
 APP_TITLE <- "Rate-My-Prof-WSU"
 
 # Example: paths, constants, small helper functions
-data_dir <- "data"
-credentials_db_path <- "credentials.sqlite"
-credentials_passphrase <- "change-this-passphrase"
-reviews_db_path <- file.path(data_dir, "reviews.sqlite")
+data_dir <- Sys.getenv("RMP_DATA_DIR", "data")
+credentials_db_path <- Sys.getenv("RMP_CREDENTIALS_DB_PATH", "credentials.sqlite")
+credentials_passphrase <- Sys.getenv("RMP_CREDENTIALS_PASSPHRASE", "change-this-passphrase")
+reviews_db_path <- Sys.getenv("RMP_REVIEWS_DB_PATH", file.path(data_dir, "reviews.sqlite"))
 VALID_REVIEW_TYPES <- c("Course", "Professor")
 
 dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
+if (!dir.exists(dirname(credentials_db_path)) && dirname(credentials_db_path) != ".") {
+  dir.create(dirname(credentials_db_path), showWarnings = FALSE, recursive = TRUE)
+}
+if (!dir.exists(dirname(reviews_db_path)) && dirname(reviews_db_path) != ".") {
+  dir.create(dirname(reviews_db_path), showWarnings = FALSE, recursive = TRUE)
+}
 
 # Example helper (available in both ui.R and server.R)
 is_admin <- function(auth) isTRUE(auth$user_info$admin)
@@ -74,22 +80,34 @@ is_admin <- function(auth) isTRUE(auth$user_info$admin)
 # ensure_credentials_store() creates an encrypted SQLite credential store when the app boots.
 ensure_credentials_store <- function(db_path = credentials_db_path,
                                      passphrase = credentials_passphrase) {
+  dir_path <- dirname(db_path)
+  if (!dir.exists(dir_path) && dir_path != ".") {
+    dir.create(dir_path, showWarnings = FALSE, recursive = TRUE)
+  }
   changed <- FALSE
 
   if (!file.exists(db_path)) {
+    placeholder <- data.frame(
+      user = "__placeholder__",
+      password = scrypt::hashPassword("placeholder"),
+      start = as.POSIXct(NA),
+      expire = as.POSIXct(NA),
+      admin = FALSE,
+      verified = TRUE,
+      is_hashed_password = TRUE,
+      created_at = NA_character_,
+      stringsAsFactors = FALSE
+    )
+
     shinymanager::create_db(
-      credentials_data = data.frame(
-        user = character(),
-        password = character(),
-        start = as.POSIXct(character()),
-        expire = as.POSIXct(character()),
-        admin = logical(),
-        verified = logical(),
-        is_hashed_password = logical(),
-        created_at = character(),
-        stringsAsFactors = FALSE
-      ),
+      credentials_data = placeholder,
       sqlite_path = db_path,
+      passphrase = passphrase
+    )
+
+    shinymanager::write_db_encrypt(
+      conn = db_path,
+      value = placeholder[0, ],
       passphrase = passphrase
     )
     changed <- TRUE

@@ -89,6 +89,17 @@ shiny::runApp(".")
 
 ---
 
+## 🐳 Docker & Compose
+
+- Build the image: `docker build -t rmp-shiny:latest .`
+- Run with persisted data (named volume keeps SQLite/db files across restarts): `docker run --rm -p 3838:3838 -v rmp_data:/app/project/data rmp-shiny:latest`
+- Compose stack (same volume, easier restarts): `docker compose up --build` then open http://localhost:3838
+- Live-edit code via bind mount: `docker compose --profile dev up --build` (uses `./project` mounted into the container; restart after adding packages)
+- Change secrets/paths with env vars: `RMP_CREDENTIALS_PASSPHRASE`, `RMP_DATA_DIR`, `RMP_CREDENTIALS_DB_PATH`, `RMP_REVIEWS_DB_PATH`, `SHINY_PORT`
+- Push to Docker Hub: `docker tag rmp-shiny:latest <hub-user>/rmp-shiny:latest && docker push <hub-user>/rmp-shiny:latest`
+
+---
+
 ## 📚 Courses Tab
 
 - Launch the app with `shiny::runApp(".")` and open the `Courses` tab to browse the mock catalog.
