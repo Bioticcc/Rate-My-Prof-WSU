@@ -197,9 +197,21 @@ ui <- tagList(
         div(
           class = "card courses-intro",
           h2("Explore WSU Courses"),
-          p("Browse available classes, search by name or department, and tap a course card to see the mock details."),
+          p("Browse available classes, filter by subject, and tap a course card to see catalog details."),
           div(
             class = "courses-intro-controls",
+            div(
+              class = "courses-subject",
+              selectizeInput(
+                inputId = "course_subject",
+                label = "Subject",
+                choices = NULL,
+                options = list(
+                  placeholder = "Start typing a subject (e.g., CPT_S)",
+                  plugins = list("clear_button")
+                )
+              )
+            ),
             div(
               class = "courses-search",
               textInput(
@@ -216,6 +228,10 @@ ui <- tagList(
                 choices = c("Course Code" = "course_id", "Title" = "title"),
                 selected = "course_id"
               )
+            ),
+            div(
+              class = "courses-download",
+              downloadButton("download_courses_json", "Download catalog JSON", class = "btn btn-outline-secondary")
             )
           )
         ),

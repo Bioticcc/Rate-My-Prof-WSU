@@ -636,10 +636,47 @@ body {
   gap:16px;
   align-items:flex-end;
 }
+.courses-intro-controls .courses-subject{
+  flex:1;
+  min-width:260px;
+}
 .courses-intro-controls .courses-search,
 .courses-intro-controls .courses-sort{
   flex:1;
   min-width:220px;
+}
+.courses-intro-controls .courses-subject,
+.courses-intro-controls .courses-search,
+.courses-intro-controls .courses-sort{
+  position:relative;
+  z-index:2;
+}
+.courses-intro-controls .courses-subject .selectize-dropdown,
+.courses-intro-controls .courses-search .selectize-dropdown,
+.courses-intro-controls .courses-sort .selectize-dropdown{
+  z-index:999 !important;
+}
+.courses-intro-controls .courses-download{
+  flex:0 0 auto;
+  margin-left:auto;
+}
+.courses-download .btn{
+  margin-bottom:0;
+  height:40px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  color:var(--text);
+  background:var(--surface);
+  box-shadow:none;
+}
+.courses-download .btn:hover,
+.courses-download .btn:focus{
+  border-color:var(--wsu-crimson);
+  color:var(--wsu-crimson);
+  background:var(--surface-2);
 }
 .courses-intro-controls .form-group{
   margin-bottom:0;
@@ -701,8 +738,26 @@ body {
 .course-stats{
   display:flex;
   gap:12px;
+  flex-wrap:wrap;
   font-size:0.85rem;
   color:var(--muted);
+}
+.course-prereqs{
+  margin-top:10px;
+  padding:10px 12px;
+  border-left:4px solid rgba(152,30,50,0.4);
+  background:var(--surface-2);
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:0.85rem;
+  color:var(--text);
+}
+.course-prereq-text,
+.course-recommend-text{
+  display:block;
+  color:inherit;
 }
 .course-empty{
   text-align:center;
@@ -791,6 +846,10 @@ body {
   font-size:1.1rem;
   color:var(--text);
 }
+.professor-title{
+  font-size:0.9rem;
+  color:var(--muted);
+}
 .professor-dept{
   font-size:0.85rem;
   color:var(--muted);
@@ -799,6 +858,10 @@ body {
 .professor-bio{
   margin-bottom:0;
   color:var(--muted);
+}
+.professor-bio.muted{
+  color:var(--muted);
+  font-size:0.85rem;
 }
 .professor-contact{
   padding:0;
@@ -1141,6 +1204,21 @@ body.dark-mode .courses-grid .card{
   background:#1f2027;
   border-color:rgba(255,255,255,0.08);
 }
+body.dark-mode .course-prereqs{
+  background:#1a1b22;
+  border-left-color:rgba(199,72,95,0.6);
+}
+body.dark-mode .courses-download .btn{
+  background:#15161e;
+  border-color:rgba(255,255,255,0.12);
+  color:#f3f4f6;
+}
+body.dark-mode .courses-download .btn:hover,
+body.dark-mode .courses-download .btn:focus{
+  border-color:rgba(199,72,95,0.65);
+  color:#ffe1e8;
+  background:#1d1f29;
+}
 body.dark-mode .professors-grid .card:hover,
 body.dark-mode .courses-grid .card:hover{
   border-color:rgba(152,30,50,0.35);
@@ -1354,6 +1432,10 @@ body:not(.dark-mode) .professors-grid .card:hover{
   border-color:rgba(152,30,50,0.3);
   box-shadow:0 20px 44px rgba(152,30,50,0.16);
 }
+body:not(.dark-mode) .course-prereqs{
+  background:#fff5f7;
+  border-left-color:rgba(152,30,50,0.35);
+}
 body:not(.dark-mode) .btn-primary{
   background:#981E32;
   border-color:#981E32;
@@ -1375,6 +1457,17 @@ body:not(.dark-mode) .btn-outline-light:focus{
   background:rgba(152,30,50,0.15);
   color:#7a1828;
   border-color:rgba(152,30,50,0.55);
+}
+body:not(.dark-mode) .courses-download .btn{
+  background:#ffffff;
+  border-color:rgba(152,30,50,0.22);
+  color:#7a1828;
+}
+body:not(.dark-mode) .courses-download .btn:hover,
+body:not(.dark-mode) .courses-download .btn:focus{
+  background:#fff0f3;
+  color:#981E32;
+  border-color:#981E32;
 }
 body:not(.dark-mode) .write-review-btn{
   border-color:rgba(152,30,50,0.45);

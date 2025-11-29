@@ -69,6 +69,16 @@ server <- function(input, output, session) {
     subject = NULL
   )
   review_feedback <- reactiveVal(NULL)
+  first_non_empty <- function(...) {
+    vals <- unlist(list(...), use.names = FALSE)
+    if (!length(vals)) {
+      return("")
+    }
+    vals <- vals[!is.na(vals)]
+    vals <- trimws(as.character(vals))
+    vals <- vals[nzchar(vals)]
+    if (length(vals)) vals[1] else ""
+  }
 
   # 3) Control overlay visibility
   showLogin   <- reactiveVal(FALSE)
@@ -417,22 +427,98 @@ server <- function(input, output, session) {
     )
   })
 
-  # --- Courses tab logic (mock data driven) ---
-  courses_path <- file.path(data_dir, "courses_mock.json")
+  # --- Courses tab logic (driven by exported WSU catalog data) ---
+  live_courses_path <- file.path(data_dir, "wsu_courses.json")
+  mock_courses_path <- file.path(data_dir, "courses_mock.json")
+
+  courses_payload <- tryCatch(
+    {
+      if (file.exists(live_courses_path)) {
+        jsonlite::fromJSON(live_courses_path, simplifyVector = TRUE)
+      } else if (file.exists(mock_courses_path)) {
+        list(courses = jsonlite::fromJSON(mock_courses_path, simplifyDataFrame = TRUE))
+      } else {
+        list()
+      }
+    },
+    error = function(err) {
+      warning(sprintf("Unable to read catalog data: %s", err$message))
+      list()
+    }
+  )
+
   courses_df <- tryCatch(
     {
-      if (file.exists(courses_path)) {
-        df <- jsonlite::fromJSON(courses_path, simplifyDataFrame = TRUE)
-        as.data.frame(df, stringsAsFactors = FALSE)
+      if (!is.null(courses_payload$courses)) {
+        as.data.frame(courses_payload$courses, stringsAsFactors = FALSE)
       } else {
         data.frame(stringsAsFactors = FALSE)
       }
     },
     error = function(err) {
-      warning(sprintf("Unable to read %s: %s", courses_path, err$message))
+      warning(sprintf("Unable to parse course data: %s", err$message))
       data.frame(stringsAsFactors = FALSE)
     }
   )
+
+  subjects_df <- tryCatch(
+    {
+      if (!is.null(courses_payload$subjects)) {
+        as.data.frame(courses_payload$subjects, stringsAsFactors = FALSE)
+      } else {
+        data.frame(stringsAsFactors = FALSE)
+      }
+    },
+    error = function(err) {
+      warning(sprintf("Unable to parse subject data: %s", err$message))
+      data.frame(stringsAsFactors = FALSE)
+    }
+  )
+
+  if (!nrow(subjects_df) && nrow(courses_df)) {
+    subjects_df <- unique(courses_df[, c("subject_code", "department"), drop = FALSE])
+    names(subjects_df) <- c("subject_code", "title")
+  }
+  if ("subject_code" %in% names(subjects_df)) {
+    subjects_df$subject_code <- trimws(as.character(subjects_df$subject_code))
+  }
+  if (!"title" %in% names(subjects_df)) {
+    subjects_df$title <- subjects_df$prefix
+  }
+  subjects_df$title <- trimws(as.character(subjects_df$title))
+  if ("subject_code" %in% names(subjects_df)) {
+    missing_title <- !nzchar(subjects_df$title) & nzchar(subjects_df$subject_code)
+    subjects_df$title[missing_title] <- subjects_df$subject_code[missing_title]
+  }
+  if (nrow(subjects_df)) {
+    subjects_df <- subjects_df[!is.na(subjects_df$subject_code) & nzchar(subjects_df$subject_code), , drop = FALSE]
+  }
+
+  text_cols <- c(
+    "course_id", "title", "department", "description", "subject_code",
+    "credits", "creditsPhrase", "typically_offered", "typicallyOffered",
+    "requisitePhrase", "recommendedPhrase", "prefixTitle", "prefix"
+  )
+  for (col in text_cols) {
+    if (!col %in% names(courses_df)) {
+      courses_df[[col]] <- ""
+    } else {
+      courses_df[[col]] <- as.character(courses_df[[col]])
+    }
+  }
+  if ("subject_code" %in% names(courses_df)) {
+    courses_df$subject_code <- trimws(courses_df$subject_code)
+  }
+  if ("course_id" %in% names(courses_df)) {
+    courses_df$course_id <- trimws(courses_df$course_id)
+  }
+
+  if ("prefixTitle" %in% names(courses_df)) {
+    missing_dept <- !nzchar(courses_df$department) & nzchar(courses_df$prefixTitle)
+    courses_df$department[missing_dept] <- courses_df$prefixTitle[missing_dept]
+  }
+  missing_dept <- !nzchar(courses_df$department)
+  courses_df$department[missing_dept] <- courses_df$subject_code[missing_dept]
 
   if (nrow(courses_df)) {
     courses_df$subject_label <- sprintf("%s — %s", courses_df$course_id, courses_df$title)
@@ -442,35 +528,122 @@ server <- function(input, output, session) {
 
   course_subjects <- if (nrow(courses_df)) sort(unique(courses_df$subject_label)) else character(0)
 
-  # --- Professors tab mock data ---
-  professors_path <- file.path(data_dir, "professors_mock.json")
-  professors_df <- tryCatch(
+  subject_choices <- if (nrow(subjects_df)) {
+    labels <- ifelse(
+      !is.na(subjects_df$title) & nzchar(subjects_df$title),
+      sprintf("%s — %s", subjects_df$subject_code, subjects_df$title),
+      subjects_df$subject_code
+    )
+    values <- subjects_df$subject_code
+    valid <- !is.na(values) & nzchar(values)
+    values <- values[valid]
+    labels <- labels[valid]
+    stats::setNames(values, labels)
+  } else {
+    character(0)
+  }
+
+  default_subject_choice <- if ("CPT_S" %in% subjects_df$subject_code) {
+    "CPT_S"
+  } else if (length(subject_choices)) {
+    unname(subject_choices[1])
+  } else {
+    ""
+  }
+
+  output$download_courses_json <- downloadHandler(
+    filename = function() {
+      sprintf("wsu_courses_%s.json", format(Sys.Date(), "%Y%m%d"))
+    },
+    content = function(file) {
+      source_path <- if (file.exists(live_courses_path)) live_courses_path else mock_courses_path
+      req(file.exists(source_path))
+      file.copy(source_path, file, overwrite = TRUE)
+    }
+  )
+
+  observe({
+    if (!length(subject_choices)) {
+      updateSelectizeInput(session, "course_subject", choices = list(), selected = NULL, server = TRUE)
+    } else {
+      selected_val <- if (nzchar(default_subject_choice)) default_subject_choice else NULL
+      updateSelectizeInput(
+        session,
+        "course_subject",
+        choices = subject_choices,
+        selected = selected_val,
+        server = TRUE
+      )
+    }
+  })
+
+  # --- Professors tab data (live PDF scrape fallback to mock) ---
+  professors_live_path <- file.path(data_dir, "wsu_professors.json")
+  professors_mock_path <- file.path(data_dir, "professors_mock.json")
+  professors_payload <- tryCatch(
     {
-      if (file.exists(professors_path)) {
-        df <- jsonlite::fromJSON(professors_path, simplifyDataFrame = TRUE)
-        as.data.frame(df, stringsAsFactors = FALSE)
+      if (file.exists(professors_live_path)) {
+        jsonlite::fromJSON(professors_live_path, simplifyVector = TRUE)
+      } else if (file.exists(professors_mock_path)) {
+        list(professors = jsonlite::fromJSON(professors_mock_path, simplifyDataFrame = TRUE))
       } else {
-        data.frame(
-          name = c("Dr. Alicia Morgan", "Prof. Daniel Lee", "Dr. Priya Shah"),
-          department = c("Computer Science", "Mathematics", "Chemistry"),
-          email = c("alicia.morgan@wsu.edu", "daniel.lee@wsu.edu", "priya.shah@wsu.edu"),
-          bio = c(
-            "Focuses on software engineering practices and mentors senior capstone teams.",
-            "Specializes in applied statistics with an emphasis on student success programs.",
-            "Leads undergraduate research opportunities in organic chemistry."
-          ),
-          stringsAsFactors = FALSE
-        )
+        list()
       }
     },
     error = function(err) {
-      warning(sprintf("Unable to read %s: %s", professors_path, err$message))
+      warning(sprintf("Unable to read professors data: %s", err$message))
+      list()
+    }
+  )
+
+  professors_df <- tryCatch(
+    {
+      if (!is.null(professors_payload$professors)) {
+        as.data.frame(professors_payload$professors, stringsAsFactors = FALSE)
+      } else {
+        data.frame(stringsAsFactors = FALSE)
+      }
+    },
+    error = function(err) {
+      warning(sprintf("Unable to parse professor data: %s", err$message))
       data.frame(stringsAsFactors = FALSE)
     }
   )
 
+  prof_text_cols <- c("name", "department", "title", "email", "phone", "campus", "raw_line", "bio")
+  for (col in prof_text_cols) {
+    if (!col %in% names(professors_df)) {
+      professors_df[[col]] <- ""
+    } else {
+      professors_df[[col]] <- as.character(professors_df[[col]])
+    }
+  }
+  # Generate placeholder emails when missing by using first/last tokens from name.
+  synthesize_email <- function(name) {
+    tokens <- unlist(strsplit(tolower(gsub("[^A-Za-z\\s]", " ", name)), "\\s+"))
+    tokens <- tokens[nzchar(tokens)]
+    if (length(tokens) >= 2) {
+      first <- tokens[1]
+      last <- tokens[length(tokens)]
+      return(sprintf("%s.%s@wsu.edu", first, last))
+    }
+    ""
+  }
+  professors_df$name <- trimws(professors_df$name)
+  missing_name <- !nzchar(professors_df$name) & nzchar(professors_df$email)
+  professors_df$name[missing_name] <- professors_df$email[missing_name]
+  professors_df$department <- trimws(professors_df$department)
+  professors_df$title <- trimws(professors_df$title)
+  professors_df$campus <- trimws(professors_df$campus)
+  professors_df$bio <- trimws(professors_df$bio)
+  professors_df$email <- ifelse(
+    nzchar(professors_df$email),
+    professors_df$email,
+    vapply(professors_df$name, synthesize_email, character(1))
+  )
+
   if (nrow(professors_df)) {
-    professors_df$subject_label <- professors_df$name
+    professors_df$subject_label <- ifelse(nzchar(professors_df$name), professors_df$name, professors_df$email)
   } else {
     professors_df$subject_label <- character()
   }
@@ -697,6 +870,10 @@ server <- function(input, output, session) {
     professor_cards <- lapply(seq_len(nrow(professors_df)), function(idx) {
       prof <- professors_df[idx, , drop = FALSE]
       label <- as.character(prof$subject_label)
+      name <- first_non_empty(prof$name, prof$email)
+      dept <- first_non_empty(prof$department, prof$campus)
+      title <- first_non_empty(prof$title)
+      email <- prof$email
 
       review_payload <- list(
         type = "Professor",
@@ -710,17 +887,23 @@ server <- function(input, output, session) {
 
       div(
         class = "professor-card card",
-        h3(class = "professor-name", prof$name),
-        span(class = "professor-dept", prof$department),
-        p(class = "professor-bio", prof$bio),
+        h3(class = "professor-name", name),
+        if (nzchar(title)) span(class = "professor-title", title),
+        if (nzchar(dept)) span(class = "professor-dept", dept),
+        if (nzchar(prof$bio)) p(class = "professor-bio", prof$bio),
+        if (!nzchar(prof$bio) && nzchar(prof$raw_line)) {
+          p(class = "professor-bio muted", prof$raw_line)
+        },
         div(
           class = "professor-actions",
-          tags$a(
-            href = sprintf("mailto:%s", prof$email),
-            class = "btn btn-link professor-contact",
-            title = "Email instructor",
-            icon("envelope")
-          ),
+          if (nzchar(email)) {
+            tags$a(
+              href = sprintf("mailto:%s", email),
+              class = "btn btn-link professor-contact",
+              title = "Email instructor",
+              icon("envelope")
+            )
+          },
           tags$button(
             type = "button",
             class = "btn btn-sm btn-primary review-card-btn",
@@ -740,6 +923,11 @@ server <- function(input, output, session) {
 
     if (!nrow(data)) {
       return(data)
+    }
+
+    subject_choice <- input$course_subject
+    if (!is.null(subject_choice) && nzchar(subject_choice)) {
+      data <- data[data$subject_code == subject_choice, , drop = FALSE]
     }
 
     query <- input$course_search
@@ -777,7 +965,7 @@ server <- function(input, output, session) {
         div(
           class = "course-empty card",
           h3("No courses found"),
-          p("Try a different search term or remove filters to see the available mock courses.")
+          p("Try a different subject or search term to see catalog results.")
         )
       )
     }
@@ -787,20 +975,11 @@ server <- function(input, output, session) {
 
       course_id <- as.character(course$course_id)
       title     <- as.character(course$title)
-      dept      <- as.character(course$department)
-      rating    <- suppressWarnings(as.numeric(course$average_rating))
-      rating_display <- if (length(rating) && is.finite(rating)) {
-        sprintf("%.1f", rating)
-      } else {
-        "N/A"
-      }
-
-      reviews_val <- suppressWarnings(as.integer(course$review_count))
-      reviews_display <- if (length(reviews_val) && !is.na(reviews_val)) {
-        format(reviews_val, big.mark = ",")
-      } else {
-        "0"
-      }
+      dept      <- first_non_empty(course$department, course$prefixTitle, course$subject_code)
+      credits_display <- first_non_empty(course$credits, course$creditsPhrase)
+      offered_display <- first_non_empty(course$typically_offered, course$typicallyOffered)
+      prereq_display  <- first_non_empty(course$requisitePhrase)
+      recommend_display <- first_non_empty(course$recommendedPhrase)
 
       onclick_js <- sprintf(
         "Shiny.setInputValue('selected_course', %s, {priority: 'event'})",
@@ -829,9 +1008,22 @@ server <- function(input, output, session) {
         p(class = "course-description", course$description),
         div(
           class = "course-stats",
-          span(class = "course-rating", sprintf("Avg rating: %s", rating_display)),
-          span(class = "course-reviews", sprintf("Reviews: %s", reviews_display))
+          span(
+            class = "course-credits",
+            sprintf("Credits: %s", if (nzchar(credits_display)) credits_display else "See catalog")
+          ),
+          span(
+            class = "course-offering",
+            sprintf("Typically offered: %s", if (nzchar(offered_display)) offered_display else "Varies")
+          )
         ),
+        if (nzchar(prereq_display) || nzchar(recommend_display)) {
+          div(
+            class = "course-prereqs",
+            if (nzchar(prereq_display)) span(class = "course-prereq-text", prereq_display),
+            if (nzchar(recommend_display)) span(class = "course-recommend-text", recommend_display)
+          )
+        },
         div(
           class = "course-actions",
           tags$button(
@@ -857,18 +1049,12 @@ server <- function(input, output, session) {
     req(nrow(course_row) == 1)
 
     course <- as.list(course_row[1, , drop = FALSE])
-    rating_val <- suppressWarnings(as.numeric(course$average_rating))
-    avg_display <- if (length(rating_val) && is.finite(rating_val)) {
-      sprintf("%.1f / 5.0", rating_val)
-    } else {
-      "N/A"
-    }
-    review_val <- suppressWarnings(as.integer(course$review_count))
-    review_display <- if (length(review_val) && !is.na(review_val)) {
-      format(review_val, big.mark = ",")
-    } else {
-      "0"
-    }
+    dept <- first_non_empty(course$department, course$prefixTitle, course$subject_code)
+    credits_display <- first_non_empty(course$credits, course$creditsPhrase)
+    offered_display <- first_non_empty(course$typically_offered, course$typicallyOffered)
+    prereq_display <- first_non_empty(course$requisitePhrase)
+    recommend_display <- first_non_empty(course$recommendedPhrase)
+    description_text <- if (nzchar(course$description)) course$description else "Description unavailable."
 
     showModal(
       modalDialog(
@@ -879,14 +1065,21 @@ server <- function(input, output, session) {
         footer = modalButton("Close"),
         div(
           class = "course-detail-modal",
-          p(span(class = "detail-label", "Department: "), course$department),
-          p(course$description),
-          div(
-            class = "course-detail-stats",
-            span(class = "course-detail-rating", sprintf("Average rating: %s", avg_display)),
-            span(class = "course-detail-reviews", sprintf("Reviews: %s", review_display))
-          ),
-          p(class = "course-detail-note", "Placeholder data – connect to live course and review data in a future update.")
+          p(span(class = "detail-label", "Department: "), dept),
+          p(span(class = "detail-label", "Credits: "),
+            if (nzchar(credits_display)) credits_display else "See advisor for details"),
+          if (nzchar(offered_display)) {
+            p(span(class = "detail-label", "Typically offered: "), offered_display)
+          },
+          p(description_text),
+          if (nzchar(prereq_display)) {
+            p(span(class = "detail-label", "Prerequisites: "), prereq_display)
+          },
+          if (nzchar(recommend_display)) {
+            p(span(class = "detail-label", "Recommended preparation: "), recommend_display)
+          },
+          p(class = "course-detail-note",
+            "Data sourced from the downloaded catalog snapshot; verify details with the official WSU schedule.")
         )
       )
     )

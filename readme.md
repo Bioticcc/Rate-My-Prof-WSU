@@ -108,6 +108,19 @@ shiny::runApp(".")
 - Selecting a course card opens a detail modal with the mock description, average rating, and review count.
 - All entries are placeholder information for prototyping and do not reflect real WSU course reviews.
 
+### Refreshing catalog data from WSU
+
+- Run `project/scripts/fetch_wsu_courses.R` to pull every subject + course directly from `catalog.wsu.edu`.
+- The script writes a structured payload to `project/data/wsu_courses.json`; point the app at this file once you're ready to swap out the mock data.
+- Supply the campus (default `Pullman`) and the catalog session token via env vars if needed:
+  ```bash
+  export WSU_CATALOG_U_TOKEN="copy-from-DevTools"
+  export WSU_CAMPUS="Pullman"
+  Rscript project/scripts/fetch_wsu_courses.R
+  ```
+- If outbound requests are blocked, download the `LoadCoursesDropDowns` payload once and save it as `project/data/subjectList.json` (or set `WSU_SUBJECT_LIST_PATH`). The fetch script will fall back to that file when the live API isn’t reachable.
+- Each run logs progress per subject and deduplicates by taking the most recent version of a course. Expect it to take ~1–2 minutes with polite delays to avoid hammering the API.
+
 ---
 
 ## 🔧 Git + GitHub Setup
