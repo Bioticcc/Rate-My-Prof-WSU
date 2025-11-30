@@ -143,34 +143,24 @@ ui <- tagList(
           )
       ),
 
-      # Two cards below the hero
-      fluidRow(
-        column(
-          width = 6,
-          div(class = "card",
-              h3("Top Professors"),
-              p("Browse the highest-rated professors across departments.")
-          )
+      # Spotlight sections
+      div(
+        class = "home-spotlights",
+        div(
+          class = "card home-top-list",
+          h3("Top Reviews"),
+          p(class = "subtext", "Most recent reviews from the community."),
+          uiOutput("home_top_reviews")
         ),
-        column(
-          width = 6,
-          div(class = "card",
-              h3("Trending Courses"),
-              p("See courses with the most recent ratings and reviews.")
-          )
+        div(
+          class = "card home-top-list",
+          h3("Top Professors"),
+          p(class = "subtext", "Most reviewed professors right now."),
+          uiOutput("home_top_professors")
         )
       )
     ),
 
-
-    tabPanel(
-      title = "Reviews of the Day!",
-      value = "reviewsOfTheDay",
-      div(class = "card",
-          h2("Today's Top Reviews"),
-          p("Once data is available, the most engaged reviews will appear here.")
-      )
-    ),
 
     tabPanel(
       title = "Professors",
@@ -180,11 +170,38 @@ ui <- tagList(
         div(
           class = "card professors-intro",
           h2("Professors and their reviews"),
-          p("Browse WSU faculty, explore quick bios, and jump into writing a review for an instructor.")
+          p("Browse WSU faculty, explore quick bios, and jump into writing a review for an instructor."),
+          div(
+            class = "professors-controls",
+            div(
+              class = "professors-search",
+              textInput(
+                inputId = "professor_search",
+                label = "Search professors",
+                placeholder = "Search by name, title, or department"
+              )
+            ),
+            div(
+              class = "professors-sort",
+              selectInput(
+                inputId = "professor_sort",
+                label = "Sort by",
+                choices = c("Name" = "name", "Department" = "department", "Title" = "title"),
+                selected = "name"
+              )
+            )
+          )
         ),
         div(
           class = "card professors-list-card",
-          uiOutput("professors_list", container = div, class = "professors-grid")
+          conditionalPanel(
+            condition = "output.professors_loaded != 'TRUE'",
+            div(class = "loading-indicator", span(class = "spinner"), span("Loading professors..."))
+          ),
+          conditionalPanel(
+            condition = "output.professors_loaded == 'TRUE'",
+            uiOutput("professors_list", container = div, class = "professors-grid")
+          )
         )
       )
     ),
@@ -237,33 +254,36 @@ ui <- tagList(
         ),
         div(
           class = "card courses-list-card",
-          uiOutput("courses_list", container = div, class = "courses-grid")
+          conditionalPanel(
+            condition = "output.courses_loaded != 'TRUE'",
+            div(class = "loading-indicator", span(class = "spinner"), span("Loading courses..."))
+          ),
+          conditionalPanel(
+            condition = "output.courses_loaded == 'TRUE'",
+            uiOutput("courses_list", container = div, class = "courses-grid")
+          )
         )
       )
     ),
 
-    # About tab
+    # Info tab (About + Feedback consolidated)
     tabPanel(
-      title = "About",
-      value = "about",
-      div(class = "card",
-          h2("About Rate-My-Prof-WSU"),
-          p("A community-driven tool for WSU students to find the right classes with confidence."),
-          p("This project is not affiliated with Washington State University but aims to follow WSU-inspired branding.")
-      )
-    ),
-
-    # Feedback tab
-    tabPanel(
-      title = "Feedback",
-      value = "feedback",
-      div(class = "card",
-          h2("Feedback"),
-          p("Have ideas or found a bug? Reach out!"),
-          tags$ul(
-            tags$li(HTML("Open an issue on GitHub: <a href='https://github.com/Bioticcc/Rate-My-Prof-WSU' target='_blank'>Repo</a>")),
-            tags$li(HTML("Email: <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a>"))
-          )
+      title = "Info",
+      value = "info",
+      div(
+        class = "card",
+        h2("About Rate-My-Prof-WSU"),
+        p("A community-driven tool for WSU students to find the right classes with confidence."),
+        p("This project is not affiliated with Washington State University but aims to follow WSU-inspired branding.")
+      ),
+      div(
+        class = "card",
+        h2("Meet the devs"),
+        tags$ul(
+          tags$li(HTML("Adam Ward — <a href='mailto:adamward.bio@gmail.com'>adamward.bio@gmail.com</a> — <a href='https://github.com/Bioticcc' target='_blank'>github.com/Bioticcc</a>")),
+          tags$li(HTML("Jaydon Devictoria — <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a> — <a href='https://github.com/ThaRealJdion' target='_blank'>github.com/ThaRealJdion</a>")),
+          tags$li(HTML("David AcLeon — <a href='mailto:david.acostaleon@wsu.edu'>david.acostaleon@wsu.edu</a> — <a href='https://github.com/davidacleon' target='_blank'>github.com/davidacleon</a>"))
+        )
       )
     )
   ), #end of navBarPage

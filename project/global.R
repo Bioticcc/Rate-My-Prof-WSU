@@ -234,13 +234,16 @@ get_user_profile <- function(username,
 
   user_reviews <- fetch_user_reviews(username)
 
+  total_likes <- tryCatch(total_likes_for_user(username), error = function(...) 0L)
+
   list(
     username = row$user,
     created_at = row$created_at,
     password_hash = row$password,
     verified = isTRUE(row$verified),
     reviews_published = nrow(user_reviews),
-    reviews = user_reviews
+    reviews = user_reviews,
+    total_likes = total_likes
   )
 }
 
@@ -260,6 +263,16 @@ ensure_review_store <- function(db_path = reviews_db_path) {
        title TEXT NOT NULL,
        body TEXT NOT NULL,
        created_at TEXT NOT NULL
+     )"
+  )
+
+  DBI::dbExecute(
+    con,
+    "CREATE TABLE IF NOT EXISTS review_likes (
+       review_id INTEGER NOT NULL,
+       user TEXT NOT NULL,
+       created_at TEXT NOT NULL,
+       PRIMARY KEY (review_id, user)
      )"
   )
 }
@@ -290,6 +303,116 @@ create_review <- function(author, review_type, subject, title, body,
   )
 }
 
+# Delete a review authored by user; cascades likes.
+delete_review <- function(review_id, author, db_path = reviews_db_path) {
+  ensure_review_store(db_path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(con))
+
+  owner <- DBI::dbGetQuery(
+    con,
+    "SELECT author FROM reviews WHERE review_id = :review_id",
+    params = list(review_id = review_id)
+  )
+  if (!nrow(owner)) {
+    stop("Review not found.")
+  }
+  if (!identical(owner$author[[1]], author)) {
+    stop("You can only delete your own reviews.")
+  }
+
+  DBI::dbExecute(
+    con,
+    "DELETE FROM review_likes WHERE review_id = :review_id",
+    params = list(review_id = review_id)
+  )
+  DBI::dbExecute(
+    con,
+    "DELETE FROM reviews WHERE review_id = :review_id",
+    params = list(review_id = review_id)
+  )
+
+  TRUE
+}
+
+# Count likes for a review_id.
+count_review_likes <- function(review_id, db_path = reviews_db_path) {
+  ensure_review_store(db_path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(con))
+
+  res <- DBI::dbGetQuery(
+    con,
+    "SELECT COUNT(*) AS like_count FROM review_likes WHERE review_id = :review_id",
+    params = list(review_id = review_id)
+  )
+  as.integer(res$like_count[[1]])
+}
+
+# Check if a user liked a review_id.
+user_liked_review <- function(review_id, user, db_path = reviews_db_path) {
+  ensure_review_store(db_path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(con))
+
+  res <- DBI::dbGetQuery(
+    con,
+    "SELECT 1 AS liked
+     FROM review_likes
+     WHERE review_id = :review_id AND user = :user
+     LIMIT 1",
+    params = list(review_id = review_id, user = user)
+  )
+  nrow(res) > 0
+}
+
+# Toggle like for a review_id by user; returns list(ok, liked, count, message).
+toggle_review_like <- function(review_id, user, db_path = reviews_db_path) {
+  ensure_review_store(db_path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(con))
+
+  liked <- user_liked_review(review_id, user, db_path)
+  now_stamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC")
+
+  if (liked) {
+    DBI::dbExecute(
+      con,
+      "DELETE FROM review_likes WHERE review_id = :review_id AND user = :user",
+      params = list(review_id = review_id, user = user)
+    )
+    liked <- FALSE
+  } else {
+    DBI::dbExecute(
+      con,
+      "INSERT OR IGNORE INTO review_likes (review_id, user, created_at)
+       VALUES (:review_id, :user, :created_at)",
+      params = list(review_id = review_id, user = user, created_at = now_stamp)
+    )
+    liked <- TRUE
+  }
+
+  count <- count_review_likes(review_id, db_path)
+  list(ok = TRUE, liked = liked, count = count, message = NULL)
+}
+
+# Total likes across all reviews authored by a user.
+total_likes_for_user <- function(user, db_path = reviews_db_path) {
+  ensure_review_store(db_path)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(con))
+
+  res <- DBI::dbGetQuery(
+    con,
+    "SELECT COUNT(*) AS total_likes
+     FROM review_likes rl
+     JOIN reviews r ON rl.review_id = r.review_id
+     WHERE r.author = :user",
+    params = list(user = user)
+  )
+  as.integer(res$total_likes[[1]])
+}
+
 # fetch_user_reviews() retrieves all reviews authored by a user ordered newest first.
 fetch_user_reviews <- function(author, db_path = reviews_db_path) {
   ensure_review_store(db_path)
@@ -298,7 +421,7 @@ fetch_user_reviews <- function(author, db_path = reviews_db_path) {
 
   df <- DBI::dbGetQuery(
     con,
-    "SELECT review_id, review_type, subject, title, body, created_at
+    "SELECT review_id, author, review_type, subject, title, body, created_at
      FROM reviews
      WHERE author = :author
      ORDER BY datetime(created_at) DESC",
