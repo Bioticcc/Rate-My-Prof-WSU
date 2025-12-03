@@ -274,18 +274,29 @@ ui <- tagList(
         class = "card",
         h2("About Rate-My-Prof-WSU"),
         p("A community-driven tool for WSU students to find the right classes with confidence."),
-        p("This project is not affiliated with Washington State University but aims to follow WSU-inspired branding.")
+        p("This project is not affiliated with Washington State University but aims to follow WSU-inspired branding."),
+        p("Built by WSU students Adam, David, and Jaydon as part of our CptS coursework."),
+        p("Some catalog data is mocked or cached while we finish the live connectors.")
       ),
       div(
         class = "card",
         h2("Meet the devs"),
         tags$ul(
-          tags$li(HTML("Adam Ward — <a href='mailto:adamward.bio@gmail.com'>adamward.bio@gmail.com</a> — <a href='https://github.com/Bioticcc' target='_blank'>github.com/Bioticcc</a>")),
-          tags$li(HTML("Jaydon Devictoria — <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a> — <a href='https://github.com/ThaRealJdion' target='_blank'>github.com/ThaRealJdion</a>")),
-          tags$li(HTML("David AcLeon — <a href='mailto:david.acostaleon@wsu.edu'>david.acostaleon@wsu.edu</a> — <a href='https://github.com/davidacleon' target='_blank'>github.com/davidacleon</a>"))
+          tags$li(HTML("Adam Ward - <a href='mailto:adamward.bio@gmail.com'>adamward.bio@gmail.com</a> - <a href='https://github.com/Bioticcc' target='_blank'>github.com/Bioticcc</a>")),
+          tags$li(HTML("Jaydon Devictoria - <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a> - <a href='https://github.com/ThaRealJdion' target='_blank'>github.com/ThaRealJdion</a>")),
+          tags$li(HTML("David AcLeon - <a href='mailto:david.acostaleon@wsu.edu'>david.acostaleon@wsu.edu</a> - <a href='https://github.com/davidacleon' target='_blank'>github.com/davidacleon</a>"))
+        )
+      ),
+      div(
+        class = "card",
+        h2("Feedback"),
+        p("Send us quick notes so we can clean things up before the next sprint."),
+        tags$ul(
+          tags$li(HTML("Open an issue on GitHub: <a href='https://github.com/Bioticcc/Rate-My-Prof-WSU' target='_blank'>Rate-My-Prof-WSU Repo</a>")),
+          tags$li(HTML("Email the team: <a href='mailto:jaydon.devictoria@wsu.edu'>jaydon.devictoria@wsu.edu</a>"))
         )
       )
-    )
+    ),
   ), #end of navBarPage
 
   conditionalPanel(
@@ -305,7 +316,4 @@ ui <- tagList(
   )
 )
 
-
-
-  
 ) #end of UI
