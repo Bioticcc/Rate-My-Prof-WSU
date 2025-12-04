@@ -61,6 +61,9 @@ server <- function(input, output, session) {
     info <- auth$user_info
     if (is.null(info$verified)) TRUE else isTRUE(info$verified)
   })
+  user_is_admin <- reactive({
+    isTRUE(auth_result()) && isTRUE(auth$user_info$admin)
+  })
   reviews_updated <- reactiveVal(Sys.time())
   # value_or_empty() normalizes NULL input values to empty strings for validation.
   value_or_empty <- function(x) if (is.null(x)) "" else x
@@ -145,6 +148,7 @@ server <- function(input, output, session) {
     username <- trimws(value_or_empty(input$signup_username))
     password <- value_or_empty(input$signup_password)
     confirm  <- value_or_empty(input$signup_confirm)
+    admin_secret <- trimws(value_or_empty(input$signup_admin_password))
 
     if (!nzchar(username) || nchar(username) < 3) {
       signup_status(list(type = "error", text = "Choose a username with at least 3 characters."))
@@ -161,8 +165,18 @@ server <- function(input, output, session) {
       return()
     }
 
+    wants_admin <- nzchar(admin_secret)
+    admin_flag <- FALSE
+    if (wants_admin) {
+      if (!identical(admin_secret, ADMIN_SIGNUP_SECRET)) {
+        signup_status(list(type = "error", text = "Admin password is incorrect. Leave blank for a regular account."))
+        return()
+      }
+      admin_flag <- TRUE
+    }
+
     result <- tryCatch(
-      register_user(username, password),
+      register_user(username, password, admin = admin_flag),
       error = function(err) {
         fallback <- err$message
         if (is.null(fallback) || !nzchar(fallback)) {
@@ -184,12 +198,17 @@ server <- function(input, output, session) {
       return()
     }
 
-    signup_status(list(type = "success", text = result$message))
+    success_message <- result$message
+    if (isTRUE(admin_flag)) {
+      success_message <- paste(success_message, "Admin privileges granted.")
+    }
+    signup_status(list(type = "success", text = success_message))
     showNotification("Account created! Log in from the Login tab.", type = "message", duration = 5)
     auth_mode("login")
     updateTextInput(session, "signup_username", value = "")
     updateTextInput(session, "signup_password", value = "")
     updateTextInput(session, "signup_confirm", value = "")
+    updateTextInput(session, "signup_admin_password", value = "")
   })
 
   output$auth_modal_tabs <- renderUI({
@@ -229,6 +248,8 @@ server <- function(input, output, session) {
           textInput("signup_username", "Username"),
           passwordInput("signup_password", "Password"),
           passwordInput("signup_confirm", "Confirm password"),
+          passwordInput("signup_admin_password", "Admin password (optional)"),
+          div(class = "auth-note", tags$small("Enter the admin password only if you were given one; otherwise leave blank.")),
           uiOutput("signup_feedback"),
           actionButton("submit_signup", "Create account", class = "btn btn-primary auth-action"),
           div(
@@ -331,6 +352,8 @@ server <- function(input, output, session) {
           tags$dd(profile$username),
           tags$dt("Password"),
           tags$dd(tags$code(password_hint)),
+          tags$dt("Role"),
+          tags$dd(if (isTRUE(profile$admin)) "Admin" else "Member"),
           tags$dt("Published reviews"),
           tags$dd(profile$reviews_published),
           tags$dt("Likes received"),
@@ -808,11 +831,12 @@ server <- function(input, output, session) {
   }
 
   render_delete_button <- function(review_id, author, allow_delete = FALSE) {
-    if (is.null(review_id) || is.na(review_id) || !isTRUE(allow_delete)) return(NULL)
+    if (is.null(review_id) || is.na(review_id)) return(NULL)
     current_user <- tryCatch(if (isTRUE(auth_result())) active_user() else NULL, error = function(...) NULL)
-    if (is.null(current_user) || !identical(current_user, author)) {
-      return(NULL)
-    }
+    admin_mode <- isTRUE(user_is_admin())
+    can_delete <- admin_mode || isTRUE(allow_delete)
+    if (!can_delete) return(NULL)
+    if (!admin_mode && (is.null(current_user) || !identical(current_user, author))) return(NULL)
     tags$button(
       type = "button",
       class = "review-delete-btn",
@@ -883,6 +907,11 @@ server <- function(input, output, session) {
         ""
       }
       like_btn <- render_like_button(rv$review_id, stats)
+      delete_btn <- render_delete_button(
+        rv$review_id,
+        rv$author,
+        allow_delete = isTRUE(!is.null(current_user) && identical(current_user, rv$author))
+      )
       div(
         class = "subject-review-card",
         div(
@@ -892,7 +921,7 @@ server <- function(input, output, session) {
         ),
         h4(class = "subject-review-title", rv$title),
         p(class = "subject-review-body", rv$body),
-        div(class = "subject-review-actions", like_btn)
+        div(class = "subject-review-actions", like_btn, delete_btn)
       )
     })
 
@@ -1078,6 +1107,11 @@ server <- function(input, output, session) {
       rv <- reviews[idx, , drop = FALSE]
       author_tag <- author_link_tag(rv$author)
       like_btn <- render_like_button(rv$review_id, stats)
+      delete_btn <- render_delete_button(
+        rv$review_id,
+        rv$author,
+        allow_delete = isTRUE(!is.null(current_user) && identical(current_user, rv$author))
+      )
       div(
         class = "home-top-card",
         h4(rv$title),
@@ -1085,7 +1119,7 @@ server <- function(input, output, session) {
             author_tag,
             sprintf("%s • %s", rv$review_type, rv$subject)),
         p(class = "body", rv$body),
-        div(class = "subject-review-actions", like_btn)
+        div(class = "subject-review-actions", like_btn, delete_btn)
       )
     })
 
@@ -1267,7 +1301,7 @@ server <- function(input, output, session) {
 
     result <- tryCatch(
       {
-        delete_review(review_id, active_user())
+        delete_review(review_id, active_user(), is_admin = user_is_admin())
         list(ok = TRUE)
       },
       error = function(err) list(ok = FALSE, message = err$message)

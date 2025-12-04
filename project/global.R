@@ -63,6 +63,7 @@ APP_TITLE <- "Rate-My-Prof-WSU"
 data_dir <- Sys.getenv("RMP_DATA_DIR", "data")
 credentials_db_path <- Sys.getenv("RMP_CREDENTIALS_DB_PATH", "credentials.sqlite")
 credentials_passphrase <- Sys.getenv("RMP_CREDENTIALS_PASSPHRASE", "change-this-passphrase")
+ADMIN_SIGNUP_SECRET <- Sys.getenv("RMP_ADMIN_SIGNUP_SECRET", "set-an-admin-pass")
 reviews_db_path <- Sys.getenv("RMP_REVIEWS_DB_PATH", file.path(data_dir, "reviews.sqlite"))
 VALID_REVIEW_TYPES <- c("Course", "Professor")
 
@@ -130,6 +131,14 @@ ensure_credentials_store <- function(db_path = credentials_db_path,
     }
   }
 
+  if ("admin" %ni% names(creds)) {
+    creds$admin <- FALSE
+    changed <- TRUE
+  } else if (!is.logical(creds$admin)) {
+    creds$admin <- tolower(as.character(creds$admin)) %in% c("true", "t", "1", "yes")
+    changed <- TRUE
+  }
+
   if ("verified" %ni% names(creds)) {
     creds$verified <- TRUE
     changed <- TRUE
@@ -170,6 +179,7 @@ ensure_credentials_store <- function(db_path = credentials_db_path,
 # register_user() adds a new credential row after validating uniqueness and hashing the password.
 register_user <- function(username,
                           password,
+                          admin = FALSE,
                           db_path = credentials_db_path,
                           passphrase = credentials_passphrase) {
   ensure_credentials_store(db_path, passphrase)
@@ -194,7 +204,7 @@ register_user <- function(username,
       password = hashed_password,
       start = as.POSIXct(NA),
       expire = as.POSIXct(NA),
-      admin = FALSE,
+      admin = isTRUE(admin),
       is_hashed_password = TRUE,
       verified = TRUE,
       created_at = created_stamp
@@ -240,6 +250,7 @@ get_user_profile <- function(username,
     username = row$user,
     created_at = row$created_at,
     password_hash = row$password,
+    admin = isTRUE(row$admin),
     verified = isTRUE(row$verified),
     reviews_published = nrow(user_reviews),
     reviews = user_reviews,
@@ -304,7 +315,7 @@ create_review <- function(author, review_type, subject, title, body,
 }
 
 # Delete a review authored by user; cascades likes.
-delete_review <- function(review_id, author, db_path = reviews_db_path) {
+delete_review <- function(review_id, actor, is_admin = FALSE, db_path = reviews_db_path) {
   ensure_review_store(db_path)
   con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
   on.exit(DBI::dbDisconnect(con))
@@ -317,7 +328,8 @@ delete_review <- function(review_id, author, db_path = reviews_db_path) {
   if (!nrow(owner)) {
     stop("Review not found.")
   }
-  if (!identical(owner$author[[1]], author)) {
+  review_owner <- owner$author[[1]]
+  if (!isTRUE(is_admin) && !identical(review_owner, actor)) {
     stop("You can only delete your own reviews.")
   }
 

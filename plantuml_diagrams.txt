@@ -1,0 +1,252 @@
+===== USE CASE DIAGRAM =====
+@startuml
+left to right direction
+actor Guest
+actor Student
+actor Admin
+Admin --|> Student
+
+usecase UC_Register as "Register account\n(register_user)"
+usecase UC_Login as "Log in\n(shinymanager::auth_server + check_creds)"
+usecase UC_ViewProfList as "Browse professor list"
+usecase UC_SearchProf as "Search/filter professors"
+usecase UC_ViewProfPage as "View professor details & reviews"
+usecase UC_ViewCourseList as "Browse courses"
+usecase UC_ViewCoursePage as "View course details & reviews"
+usecase UC_SubmitReview as "Publish review\n(create_review)"
+usecase UC_LikeReview as "Like / unlike review\n(toggle_review_like)"
+usecase UC_DeleteOwn as "Delete own review\n(delete_review)"
+usecase UC_ViewProfile as "View own profile & reviews\n(get_user_profile, fetch_user_reviews)"
+usecase UC_DownloadCatalog as "Download course catalog JSON"
+usecase UC_Moderate as "Admin remove any review\n(delete_review with is_admin)"
+
+Guest --> UC_Register
+Guest --> UC_Login
+Guest --> UC_ViewProfList
+Guest --> UC_SearchProf
+Guest --> UC_ViewProfPage
+Guest --> UC_ViewCourseList
+Guest --> UC_ViewCoursePage
+Guest --> UC_DownloadCatalog
+
+Student --> UC_SubmitReview
+Student --> UC_LikeReview
+Student --> UC_DeleteOwn
+Student --> UC_ViewProfile
+Student --> UC_ViewProfList
+Student --> UC_SearchProf
+Student --> UC_ViewProfPage
+Student --> UC_ViewCourseList
+Student --> UC_ViewCoursePage
+Student --> UC_DownloadCatalog
+
+Admin --> UC_Moderate
+Admin --> UC_DeleteOwn
+@enduml
+
+===== CLASS DIAGRAM =====
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+  +user: string
+  +password: string
+  +admin: boolean
+  +verified: boolean
+  +created_at: datetime
+}
+class Admin
+User <|-- Admin
+
+class CredentialsStore <<module>> {
+  +ensure_credentials_store(db_path, passphrase)
+  +register_user(username, password, admin=FALSE)
+  +check_creds(user, password)
+  +get_user_profile(username)
+}
+CredentialsStore --> User : manages
+
+class Review {
+  +review_id: integer
+  +author: string
+  +review_type: "Course"|"Professor"
+  +subject: string
+  +title: string
+  +body: string
+  +created_at: datetime
+}
+class ReviewLike {
+  +review_id: integer
+  +user: string
+  +created_at: datetime
+}
+
+class ReviewStore <<module>> {
+  +ensure_review_store(db_path)
+  +create_review(author, review_type, subject, title, body)
+  +delete_review(review_id, actor, is_admin)
+  +list_reviews_for_subject(review_type, subject)
+  +fetch_user_reviews(author)
+  +toggle_review_like(review_id, user)
+  +count_review_likes(review_id)
+  +total_likes_for_user(user)
+}
+ReviewStore --> Review : persists
+ReviewStore --> ReviewLike : persists
+
+User "1" --> "*" Review : authors
+User "1" --> "*" ReviewLike : likes
+Review "1" --> "*" ReviewLike : receives
+
+class courses_df <<dataset>> {
+  +course_id
+  +title
+  +department
+  +subject_code
+  +description
+  +credits
+  +subject_label
+}
+class professors_df <<dataset>> {
+  +name
+  +department
+  +title
+  +email
+  +campus
+  +bio
+  +subject_label
+  +review_count
+}
+courses_df "1" o-- "*" Review : subject (Course)
+professors_df "1" o-- "*" Review : subject (Professor)
+
+class ShinyServer <<controller>> {
+  +auth_server(check_creds)
+  +open_review_modal()
+  +render_subject_reviews()
+  +observeEvent(inputs...)
+}
+ShinyServer ..> CredentialsStore : uses for auth/register
+ShinyServer ..> ReviewStore : uses for reviews/likes
+ShinyServer ..> courses_df : filters/searches
+ShinyServer ..> professors_df : filters/searches
+@enduml
+
+===== SEQUENCE DIAGRAM: LOGIN =====
+@startuml
+title Login via shinymanager
+actor Student
+participant "Browser/UI" as UI
+participant "auth_server\n(shinymanager)" as Auth
+participant "check_creds\n(global.R)" as CheckCreds
+database "credentials.sqlite" as CredsDB
+
+Student -> UI : Open login overlay\nenter user_id/password
+UI -> Auth : go_auth(user_id, user_pwd)
+Auth -> CheckCreds : check_creds(user, password)
+CheckCreds -> CredsDB : ensure_credentials_store()\nread_db_decrypt()
+CredsDB --> CheckCreds : credential rows
+CheckCreds -> CredsDB : check_credentials(user, password)
+CredsDB --> CheckCreds : auth result
+CheckCreds --> Auth : TRUE/FALSE + user_info
+Auth --> UI : auth$result (session)
+UI --> Student : Close modal, redirect to Home
+@enduml
+
+===== SEQUENCE DIAGRAM: VIEW PROFESSOR PAGE =====
+@startuml
+title View professor details and reviews
+actor User
+participant "Browser/UI" as UI
+participant "server.R" as Server
+participant "professors_df" as ProfData
+participant "render_subject_reviews()" as RenderReviews
+participant "list_reviews_for_subject()" as ListReviews
+database "reviews.sqlite" as ReviewsDB
+
+User -> UI : Click professor card
+UI -> Server : selected_professor = subject_label
+Server -> ProfData : lookup professor row
+ProfData --> Server : professor metadata
+Server -> RenderReviews : render_subject_reviews("Professor", subject_label)
+RenderReviews -> ListReviews : list_reviews_for_subject("Professor", subject)
+ListReviews -> ReviewsDB : SELECT reviews WHERE subject+type
+ReviewsDB --> ListReviews : review rows
+ListReviews --> RenderReviews : tibble of reviews
+RenderReviews --> Server : HTML review list
+Server --> UI : modal with professor info + reviews + like/delete buttons
+UI --> User : Professor page rendered
+@enduml
+
+===== SEQUENCE DIAGRAM: SUBMIT REVIEW =====
+@startuml
+title Publish review for course/professor
+actor Student
+participant "Browser/UI" as UI
+participant "server.R" as Server
+participant "create_review()" as CreateReview
+database "reviews.sqlite" as ReviewsDB
+
+Student -> UI : Fill review modal\n(review_type, subject, title, body)
+UI -> Server : submit_review event with form data
+Server -> Server : validate auth_result()\ncheck user_verified()\nvalidate subject/title/body
+Server -> CreateReview : create_review(author, review_type, subject, title, body)
+CreateReview -> ReviewsDB : ensure_review_store();\nINSERT INTO reviews (...)
+ReviewsDB --> CreateReview : insert ok
+CreateReview --> Server : success
+Server -> UI : removeModal();\nshowNotification("Review published");\ntrigger reviews_updated()
+UI --> Student : Updated lists show new review
+@enduml
+
+===== SEQUENCE DIAGRAM: ADMIN MODERATION =====
+@startuml
+title Admin deletes a review
+actor Admin
+participant "Browser/UI" as UI
+participant "server.R" as Server
+participant "delete_review()" as DeleteReview
+database "reviews.sqlite" as ReviewsDB
+
+Admin -> UI : Click Delete on review card
+UI -> Server : delete_review{id}
+Server -> Server : ensure auth_result();\nuser_is_admin() == TRUE
+Server -> DeleteReview : delete_review(review_id, actor, is_admin=TRUE)
+DeleteReview -> ReviewsDB : ensure_review_store()
+DeleteReview -> ReviewsDB : SELECT author WHERE review_id
+ReviewsDB --> DeleteReview : owner row
+DeleteReview -> ReviewsDB : DELETE FROM review_likes\nDELETE FROM reviews
+ReviewsDB --> DeleteReview : deletion ok
+DeleteReview --> Server : ok
+Server -> UI : showNotification("Review deleted");\nrefresh profile/review list
+UI --> Admin : Review removed from UI
+@enduml
+
+===== ACTIVITY DIAGRAM: SUBMIT REVIEW =====
+@startuml
+start
+:User opens review modal and enters\nreview_type, subject, title, body;
+if (auth_result() ?) then (no)
+  :Show notification "Log in to write a review"; 
+  stop
+endif
+if (user_verified() ?) then (no)
+  :review_feedback <- "Only verified accounts can publish reviews.";
+  stop
+endif
+if (Subject chosen and valid?) then (no)
+  :review_feedback <- "Please choose a subject.";
+  stop
+endif
+if (Title >= 3 chars?) then (no)
+  :review_feedback <- "Add a short title (at least 3 characters).";
+  stop
+endif
+if (Body >= 20 chars?) then (no)
+  :review_feedback <- "Share a bit more detail (20+ characters).";
+  stop
+endif
+:Call create_review(author, review_type,\nsubject, title, body);
+:ensure_review_store(); insert row into reviews.sqlite;
+:removeModal(); showNotification("Review published");\nreviews_updated(Sys.time());
+stop
+@enduml

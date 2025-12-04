@@ -83,6 +83,7 @@
 :root{
   --wsu-crimson:#981E32;
   --wsu-crimson-dark:#7a1828;
+  --wsu-gray:#5E6A71;
   --text:#1f2937;
   --muted:#5e6a71;
   --bg:#f7f7f9;
@@ -90,6 +91,17 @@
   --surface-2:#f2f4f8;
   --ring:rgba(152,30,50,0.35);
   --border:#d7dbe2;
+}
+
+/* Swap the core palette when dark mode is active */
+body.dark-mode{
+  --text:#f3f4f6;
+  --muted:#cbd5e1;
+  --bg:#1c1f23;
+  --surface:#2a2f34;
+  --surface-2:#24292e;
+  --ring:rgba(152,30,50,0.5);
+  --border:rgba(255,255,255,0.08);
 }
 
 html,body{height:100%}
@@ -139,18 +151,6 @@ body{
 /* =========================
    Dark Mode — WSU Accents
    ========================= */
-:root{
-  --wsu-crimson:#981E32;
-  --wsu-crimson-dark:#7a1828;
-  --text:#e5e7eb;         /* gray-200 */
-  --muted:#9ca3af;        /* gray-400 */
-  --bg:#0b0f14;           /* near-black */
-  --surface:#121826;      /* panel/card bg */
-  --surface-2:#0f1522;    /* slightly darker for contrast blocks */
-  --ring:rgba(152,30,50,.45);
-  --border:rgba(255,255,255,.08);
-}
-
 html,body{height:100%}
 body{
   font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
@@ -278,19 +278,6 @@ a:hover{ color:#fecdd3 }     /* lighter on hover */
 /* ==============================
    Cougar Dark Theme Overrides
    ============================== */
-
-:root {
-  --wsu-crimson: #981E32;      /* Cougar Crimson */
-  --wsu-crimson-dark: #7a1828; /* Dark Crimson */
-  --wsu-gray: #5E6A71;         /* Cougar Gray */
-  --text: #f3f4f6;             /* near-white text */
-  --muted: #cbd5e1;            /* softer gray text */
-  --bg: #1c1f23;               /* dark gray background */
-  --surface: #2a2f34;          /* panel/card background */
-  --surface-2: #24292e;        /* deeper surface */
-  --ring: rgba(152, 30, 50, 0.5);
-  --border: rgba(255, 255, 255, 0.08);
-}
 
 /* Body background */
 body {
