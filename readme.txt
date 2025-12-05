@@ -1,4 +1,4 @@
-Rate-My-Prof-WSU (Shiny App)
+Rate-My-Prof-WSU (Shiny App) - CURRENTLY LIVE AT: https://ward-bio.shinyapps.io/RMP-WSU/
 
 Overview
 - Shiny application built in R for WSU course and professor reviews. Developed in WSL/Ubuntu with VS Code and version-controlled via GitHub.
